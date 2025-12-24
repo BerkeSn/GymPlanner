@@ -1,64 +1,89 @@
-const { Model } = require('sequelize');
+const bcrypt = require('bcryptjs'); // Şifreleme kütüphanesini çağırdık
 
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
-    static associate(models) {
-        
-      User.belongsToMany(models.Exercise, { through: 'UserFavorites', as: 'favorites' });
-      User.hasMany(models.WeeklyRoutine, { foreignKey: 'userId', as: 'routines' });
-      User.hasMany(models.WorkoutLog, { foreignKey: 'userId', as: 'logs' });
-      User.belongsToMany(models.User, { 
-        as: 'Friends', 
-        through: models.Friendship, 
-        foreignKey: 'requesterId', 
-        otherKey: 'addresseeId' 
-      });
-
-      User.hasMany(models.Message, { foreignKey: 'senderId', as: 'sentMessages' });
-      User.hasMany(models.Message, { foreignKey: 'receiverId', as: 'receivedMessages' });
-    }
-  }
-
-  User.init({
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
+  const User = sequelize.define("User", {
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true // Aynı kullanıcı adı 2 kere alınamaz
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true, // Aynı email ile 2 kere kayıt olunamaz
+      validate: {
+        isEmail: true // Email formatı kontrolü (örn: a@b olmaz, a@b.com olmalı)
+      }
+    },
+    password: {
+      type: DataTypes.STRING,
       allowNull: false
     },
-    username: { 
-      type: DataTypes.STRING, 
-      allowNull: false, 
-      unique: true 
+    role: {
+      type: DataTypes.ENUM('coach', 'gymrat'),
+      defaultValue: 'gymrat'
     },
-    email: { 
-      type: DataTypes.STRING, 
-      allowNull: false, 
-      unique: true,
-      validate: { isEmail: true }
-    },
-    password: { 
-      type: DataTypes.STRING, 
-      allowNull: false 
-    },
-    role: { 
-      type: DataTypes.ENUM('coach', 'gymrat'), 
-      defaultValue: 'gymrat' 
-    },
-    profileImage: { 
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    bio: { 
-      type: DataTypes.TEXT,
-      allowNull: true
+    bio: {
+      type: DataTypes.STRING
     }
   }, {
-    sequelize,
-    modelName: 'User',
-    timestamps: true,
-    paranoid: true,
+    // HOOKS: Veritabanına yazmadan hemen önce araya giren fonksiyonlar
+    hooks: {
+      // 1. Yeni kullanıcı oluşturulurken şifreyi şifrele
+      beforeCreate: async (user) => {
+        if (user.password) {
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
+      },
+      // 2. Profil güncellenirken EĞER şifre değiştiyse tekrar şifrele
+      beforeUpdate: async (user) => {
+        if (user.changed('password')) {
+          const salt = await bcrypt.genSalt(10);
+          user.password = await bcrypt.hash(user.password, salt);
+        }
+      }
+    }
   });
+
+  // INSTANCE METHOD: Giriş yaparken şifre kontrolü için özel fonksiyon
+  // Bu fonksiyonu authController'da kullanacağız.
+  User.prototype.validPassword = async function(password) {
+    return await bcrypt.compare(password, this.password);
+  };
+
+  // İLİŞKİLER (Associations)
+  User.associate = (models) => {
+    // Bir kullanıcının birden fazla haftalık programı olabilir
+    User.hasMany(models.WeeklyRoutine, { 
+      foreignKey: 'userId',
+      onDelete: 'CASCADE' // Kullanıcı silinirse programları da silinsin
+    });
+
+    // Bir kullanıcının birden fazla antrenman logu olabilir
+    User.hasMany(models.WorkoutLog, { 
+      foreignKey: 'userId',
+      onDelete: 'CASCADE' 
+    });
+    
+    // Arkadaşlık İlişkileri (Çoka-Çok - Self Referencing)
+    User.belongsToMany(User, { 
+      as: 'Friends', 
+      through: models.Friendship, 
+      foreignKey: 'requesterId', 
+      otherKey: 'addresseeId' 
+    });
+    
+    // Mesajlar (Gönderen ve Alan olarak 2 ayrı ilişki)
+    User.hasMany(models.Message, { 
+      foreignKey: 'senderId', 
+      as: 'SentMessages' 
+    });
+    User.hasMany(models.Message, { 
+      foreignKey: 'receiverId', 
+      as: 'ReceivedMessages' 
+    });
+  };
 
   return User;
 };

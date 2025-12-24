@@ -1,9 +1,8 @@
 const db = require('../models');
 const User = db.User;
 const Friendship = db.Friendship;
-const { Op } = require('sequelize'); // Gelişmiş sorgular için
+const { Op } = require('sequelize');
 
-// 1. Arkadaşlık İsteği Gönder
 exports.sendRequest = async (req, res) => {
   try {
     const { requesterId, addresseeId } = req.body;
@@ -29,12 +28,10 @@ exports.sendRequest = async (req, res) => {
   }
 };
 
-// 2. İsteği Kabul Et
 exports.acceptRequest = async (req, res) => {
   try {
-    const { requesterId, addresseeId } = req.body; // İsteği atan ve kabul eden
+    const { requesterId, addresseeId } = req.body; 
 
-    // Durumu güncelle
     const updated = await Friendship.update(
       { status: 'accepted' },
       { where: { requesterId, addresseeId, status: 'pending' } }
@@ -49,14 +46,9 @@ exports.acceptRequest = async (req, res) => {
   }
 };
 
-// 3. Arkadaş Listesini Getir
 exports.getFriends = async (req, res) => {
   try {
     const { userId } = req.params;
-
-    // Burada biraz SQL büyüsü gerekebilir ama Sequelize ile şöyle yaparız:
-    // Hem 'requester' hem 'addressee' olduğum ve durumun 'accepted' olduğu kayıtları bul.
-    // Şimdilik basitçe Friendship tablosundan çekelim.
     
     const friends = await Friendship.findAll({
         where: {

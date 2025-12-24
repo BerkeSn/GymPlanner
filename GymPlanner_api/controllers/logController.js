@@ -24,7 +24,6 @@ exports.createLog = async (req, res) => {
   }
 };
 
-// 2. Bir Hareketin Geçmişini Getir (PAGINATION EKLENDİ)
 exports.getLogsByExercise = async (req, res) => {
   try {
     const { userId, exerciseId, page, limit } = req.query;
