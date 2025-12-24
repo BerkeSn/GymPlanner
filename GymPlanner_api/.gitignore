@@ -1,0 +1,29 @@
+# --- Dependencies (Bağımlılıklar) ---
+node_modules/
+package-lock.json # (Opsiyonel: Genelde atılır ama bazen çakışma olmasın diye çıkarılır. Sen şimdilik atabilirsin, buraya yazmana gerek yok)
+
+# --- Security & Environment (Güvenlik) ---
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# --- Logs (Loglar) ---
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- IDE Settings (VS Code vb. ayarları) ---
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- OS Files (İşletim Sistemi Dosyaları) ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
