@@ -24,18 +24,49 @@ exports.createLog = async (req, res) => {
   }
 };
 
-// 2. Bir Hareketin Geçmişini Getir (İlerleme Takibi)
+// 2. Bir Hareketin Geçmişini Getir (PAGINATION EKLENDİ)
 exports.getLogsByExercise = async (req, res) => {
   try {
-    const { userId, exerciseId } = req.query;
+    const { userId, exerciseId, page, limit } = req.query;
 
-    const logs = await WorkoutLog.findAll({
+    // Sayfa sayısı gelmezse varsayılan 1 olsun, limit gelmezse 10 olsun.
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
+    const offset = (pageNum - 1) * limitNum;
+
+    const { count, rows } = await WorkoutLog.findAndCountAll({
       where: { userId, exerciseId },
-      order: [['date', 'DESC']], // En yeni en üstte
-      limit: 10 // Son 10 antrenman
+      order: [['date', 'DESC']],
+      limit: limitNum,  // Kaç tane getireyim?
+      offset: offset    // Kaç tane atlayayım?
     });
 
-    res.status(200).json(logs);
+    res.status(200).json({
+      totalItems: count,      // Toplam kaç kayıt var?
+      totalPages: Math.ceil(count / limitNum), // Toplam kaç sayfa sürer?
+      currentPage: pageNum,   // Şu an hangi sayfadayız?
+      data: rows              // Ve veriler
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// 3. Hatalı Logu Sil (DELETE)
+exports.deleteLog = async (req, res) => {
+  try {
+    const { id } = req.params; // Silinecek logun ID'si URL'den gelir
+
+    const deleted = await WorkoutLog.destroy({
+      where: { id: id }
+    });
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Silinecek kayıt bulunamadı." });
+    }
+
+    res.status(200).json({ message: "Kayıt başarıyla silindi." });
 
   } catch (error) {
     res.status(500).json({ error: error.message });

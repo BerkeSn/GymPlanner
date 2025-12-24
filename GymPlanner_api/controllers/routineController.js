@@ -75,3 +75,26 @@ exports.removeFromRoutine = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// 4. Rutindeki Hareketin Hedeflerini Güncelle (UPDATE)
+exports.updateRoutineExercise = async (req, res) => {
+  try {
+    const { routineId, exerciseId, targetSets, targetReps, orderIndex } = req.body;
+
+    // RoutineExercise, bizim tanımladığımız Pivot Modeldi.
+    // Doğrudan o tabloda, bu rutin ve bu harekete ait satırı bulup güncelliyoruz.
+    const [updatedCount] = await RoutineExercise.update(
+      { targetSets, targetReps, orderIndex }, // Değişecek alanlar
+      { where: { routineId, exerciseId } }    // Hangi satır?
+    );
+
+    if (updatedCount === 0) {
+      return res.status(404).json({ message: "Bu rutinde böyle bir hareket bulunamadı." });
+    }
+
+    res.status(200).json({ message: "Program güncellendi Boss!" });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

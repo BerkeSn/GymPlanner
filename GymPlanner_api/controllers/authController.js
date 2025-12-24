@@ -57,3 +57,32 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// 3. Profil Güncelle (UPDATE)
+exports.updateProfile = async (req, res) => {
+  try {
+    const { id } = req.params; // URL'den ID'yi alıyoruz (/api/auth/update/1 gibi)
+    const { bio, password, email } = req.body; // Değişmesini istediğimiz veriler
+
+    // DİKKAT: Şifre güncelleme varsa hashleme gerekir (Şimdilik düz yapıyoruz ama ilerde değişecek)
+    
+    const [updated] = await User.update(req.body, {
+      where: { id: id }
+    });
+
+    if (!updated) {
+      return res.status(404).json({ message: "Kullanıcı bulunamadı." });
+    }
+
+    // Güncel kullanıcıyı geri döndürelim
+    const updatedUser = await User.findByPk(id);
+
+    res.status(200).json({ 
+      message: "Profil güncellendi.", 
+      user: updatedUser 
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

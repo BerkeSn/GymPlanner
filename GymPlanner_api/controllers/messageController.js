@@ -22,22 +22,34 @@ exports.sendMessage = async (req, res) => {
   }
 };
 
-// 2. İki Kişi Arasındaki Konuşmayı Getir
+// 2. İki Kişi Arasındaki Konuşmayı Getir (PAGINATION EKLENDİ)
 exports.getConversation = async (req, res) => {
   try {
-    const { userId1, userId2 } = req.query;
+    const { userId1, userId2, page, limit } = req.query;
 
-    const messages = await Message.findAll({
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 20; // Mesajlaşmada genelde daha çok veri çekilir
+    const offset = (pageNum - 1) * limitNum;
+
+    const { count, rows } = await Message.findAndCountAll({
       where: {
         [Op.or]: [
           { senderId: userId1, receiverId: userId2 },
           { senderId: userId2, receiverId: userId1 }
         ]
       },
-      order: [['createdAt', 'ASC']] // Eskiden yeniye
+      order: [['createdAt', 'DESC']], // En yeni mesajı önce getir (WhatsApp mantığı)
+      limit: limitNum,
+      offset: offset
     });
 
-    res.status(200).json(messages);
+    // Mesajlar tersten (yeni -> eski) gelir, frontend bunu ters çevirip gösterir.
+    res.status(200).json({
+      totalMessages: count,
+      totalPages: Math.ceil(count / limitNum),
+      currentPage: pageNum,
+      messages: rows
+    });
 
   } catch (error) {
     res.status(500).json({ error: error.message });
