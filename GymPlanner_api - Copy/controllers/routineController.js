@@ -98,3 +98,13 @@ exports.updateRoutineExercise = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.deleteRoutine = async (req, res) => {
+  try {
+    const { routineId } = req.params;
+    await WeeklyRoutine.destroy({ where: { id: routineId } });
+    res.status(200).json({ message: "Rutin silindi." });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
