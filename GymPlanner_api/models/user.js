@@ -1,9 +1,31 @@
-const {Model} = require('sequelize');
+const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      // İlişkiler buraya gelecek (örneğin: User.hasMany(models.Workout))
+      User.hasMany(models.BodyMeasurement,
+        { foreignKey: 'userId', as: 'bodyMeasurements' }
+      );
+      User.hasMany(models.WorkoutRoutine,
+        { foreignKey: 'userId', as: 'workoutRoutines' }
+      );
+      User.hasMany(models.WorkoutLog,
+        { foreignKey: 'userId', as: 'workoutLogs' }
+      );
+      User.hasMany(models.UserFavorite, {
+        foreignKey: 'userId',
+        as: 'favorites'
+      });
+
+      User.hasMany(models.Friendship, {
+        foreignKey: 'requesterId',
+        as: 'sentRequests'
+      });
+      
+      User.hasMany(models.Friendship, {
+        foreignKey: 'receiverId',
+        as: 'receivedRequests'
+      });
     }
   }
 
@@ -42,8 +64,14 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true
     },
     gender: {
-      type: DataTypes.ENUM('male', 'female'),
-      allowNull: false
+      type: DataTypes.ENUM('male', 'female', 'other'),
+      allowNull: false,
+      defaultValue: 'other'
+    },
+    locationPreference: {
+      type: DataTypes.ENUM('Home', 'Gym'),
+      allowNull: false,
+      defaultValue: 'Gym'
     },
   }, {
     sequelize,

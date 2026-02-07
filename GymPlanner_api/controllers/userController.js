@@ -11,6 +11,11 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Lütfen tüm alanları doldurun" });
     }
 
+    const existingUsername = await db.User.findOne({ where: { username } });
+    if (existingUsername) {
+      return res.status(400).json({ message: "Bu kullanıcı adı zaten alınmış." });
+    }
+
     const existingUser = await db.User.findOne({ where: { email } });
 
     if (existingUser) {
@@ -34,9 +39,16 @@ exports.register = async (req, res) => {
     const userResponse = newUser.toJSON();
     delete userResponse.password;
 
+    const token = jwt.sign(
+      { id: newUser.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
     res.status(201).json({
       message: "Kullanıcı başarıyla oluşturuldu!",
-      user: userResponse
+      user: userResponse,
+      token: token
     });
 
   } catch (error) {
@@ -52,37 +64,33 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1. Kullanıcıyı bul
     const user = await db.User.findOne({ where: { email } });
 
     if (!user) {
       return res.status(401).json({ success: false, message: "E-posta veya şifre hatalı." });
     }
 
-    // 2. Şifreyi kontrol et
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
       return res.status(401).json({ success: false, message: "E-posta veya şifre hatalı." });
     }
 
-    // 3. Token Oluştur (İmza atıyoruz)
     const token = jwt.sign(
-      { 
-        id: user.id, 
-      }, 
+      {
+        id: user.id,
+      },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }  
+      { expiresIn: '24h' }
     );
 
     const userData = user.toJSON();
     delete userData.password;
 
-    // 4. Cevabı Gönder
     res.status(200).json({
       success: true,
       message: "Giriş başarılı!",
-      token: token, // <-- İşte frontend'in saklayacağı altın anahtar
+      token: token,
       user: userData
     });
 
@@ -94,28 +102,39 @@ exports.login = async (req, res) => {
 // Update
 exports.updateProfile = async (req, res) => {
   try {
-    const userId = req.userData.id; 
-    const { name, surname, phone, birthdate, gender } = req.body;
+    const userId = req.userData.id;
+    const { username, name, surname, phone, birthdate, gender, locationPreference } = req.body;
+
+    if (username) {
+      const userWithSameName = await db.User.findOne({ where: { username } });
+
+      if (userWithSameName && userWithSameName.id !== userId) {
+        return res.status(400).json({
+          success: false,
+          message: "Bu kullanıcı adı başkası tarafından kullanılıyor Agam, başka bir tane seç."
+        });
+      }
+    }
 
     // 3. Güncelleme İşlemi
-    const [updated] = await db.User.update(
-      { name, surname, phone, birthdate, gender },
+    const [updatedRows] = await db.User.update(
+      { username, name, surname, phone, birthdate, gender, locationPreference },
       { where: { id: userId } }
     );
 
-    if (!updated) {
+    // 4. Kritik Müdahale: Güncelleme sonucuna bakmadan önce, son halini çekiyoruz.
+    const updatedUser = await db.User.findByPk(userId, {
+      attributes: { exclude: ['password'] }
+    });
+
+    if (!updatedUser) {
       return res.status(404).json({ success: false, message: "Kullanıcı bulunamadı." });
     }
 
-    // 4. Güncel veriyi çek (Şifreyi hariç tutarak)
-    const updatedUser = await User.findByPk(userId, {
-        attributes: { exclude: ['password'] }
-    });
-
-    res.status(200).json({ 
+    res.status(200).json({
       success: true,
-      message: "Profil başarıyla güncellendi.", 
-      user: updatedUser 
+      message: updatedRows > 0 ? "Profil başarıyla güncellendi." : "Herhangi bir değişiklik yapılmadı.",
+      user: updatedUser
     });
 
   } catch (error) {
