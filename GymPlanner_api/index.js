@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 // Veritabanı Senkronizasyonu
-db.sequelize.sync({ force: true }).then(() => {
+db.sequelize.sync({ alter: true }).then(() => {
   console.log('✅ Veritabanı senkronize.');
   // require('./seed')(db); 
   

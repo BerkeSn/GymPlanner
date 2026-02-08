@@ -1,6 +1,7 @@
 const db = require('../models');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const {Op} = require('sequelize');
 
 // Register
 exports.register = async (req, res) => {
@@ -20,6 +21,11 @@ exports.register = async (req, res) => {
 
     if (existingUser) {
       return res.status(400).json({ message: "Bu email zaten kayıtlı." });
+    }
+
+    const existingPhone = await db.User.findOne({ where: { phone } });
+    if (existingPhone) {
+      return res.status(400).json({ message: "Bu telefon numarası zaten kayıtlı." });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -62,9 +68,21 @@ exports.register = async (req, res) => {
 // Login
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { loginInput, password } = req.body;
 
-    const user = await db.User.findOne({ where: { email } });
+    if (!loginInput || !password) {
+      return res.status(400).json({ success: false, message: "Lütfen e-posta veya kullanıcı adı ve şifrenizi girin." });
+    }
+
+    const user = await db.User.findOne({
+      where: {
+        [Op.or]: [
+          { email: loginInput },
+          { username: loginInput },
+          { phone: loginInput }
+        ]
+      }
+    });
 
     if (!user) {
       return res.status(401).json({ success: false, message: "E-posta veya şifre hatalı." });
@@ -99,41 +117,56 @@ exports.login = async (req, res) => {
   }
 };
 
-// Update
+// Update Profile
 exports.updateProfile = async (req, res) => {
   try {
-    const userId = req.userData.id;
-    const { username, name, surname, phone, birthdate, gender, locationPreference } = req.body;
+    const userId = req.user.id; 
+    const { username, name, surname, phone, birthdate, gender, locationPreference, email } = req.body;
 
     if (username) {
       const userWithSameName = await db.User.findOne({ where: { username } });
-
       if (userWithSameName && userWithSameName.id !== userId) {
-        return res.status(400).json({
-          success: false,
-          message: "Bu kullanıcı adı başkası tarafından kullanılıyor Agam, başka bir tane seç."
-        });
+        return res.status(400).json({ success: false, message: "Kullanıcı adı kullanımda." });
       }
     }
 
-    // 3. Güncelleme İşlemi
+    if(phone) {
+      const userWithSamePhone = await db.User.findOne({ where: { phone } });
+      if (userWithSamePhone && userWithSamePhone.id !== userId) {
+        return res.status(400).json({ success: false, message: "Telefon numarası kullanımda." });
+      }
+    }
+
+    if (email) {
+      const userWithSameEmail = await db.User.findOne({ where: { email } });
+      if (userWithSameEmail && userWithSameEmail.id !== userId) {
+        return res.status(400).json({ success: false, message: "E-posta kullanımda." });
+      }
+    }
+
+    // --- Güncelleme Objesi Hazırlama (Sadece dolu gelenleri güncelle) ---
+    const updateFields = {};
+    if (username) updateFields.username = username;
+    if (name) updateFields.name = name;
+    if (surname) updateFields.surname = surname;
+    if (phone) updateFields.phone = phone;
+    if (birthdate) updateFields.birthdate = birthdate;
+    if (gender) updateFields.gender = gender;
+    if (email) updateFields.email = email;
+    if (locationPreference !== undefined) updateFields.locationPreference = locationPreference;
+
     const [updatedRows] = await db.User.update(
-      { username, name, surname, phone, birthdate, gender, locationPreference },
+      updateFields,
       { where: { id: userId } }
     );
 
-    // 4. Kritik Müdahale: Güncelleme sonucuna bakmadan önce, son halini çekiyoruz.
     const updatedUser = await db.User.findByPk(userId, {
       attributes: { exclude: ['password'] }
     });
 
-    if (!updatedUser) {
-      return res.status(404).json({ success: false, message: "Kullanıcı bulunamadı." });
-    }
-
     res.status(200).json({
       success: true,
-      message: updatedRows > 0 ? "Profil başarıyla güncellendi." : "Herhangi bir değişiklik yapılmadı.",
+      message: updatedRows > 0 ? "Profil güncellendi." : "Değişiklik yapılmadı.",
       user: updatedUser
     });
 
