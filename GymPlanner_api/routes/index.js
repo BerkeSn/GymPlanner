@@ -1,27 +1,28 @@
-const express = require("express");
-const fs = require("fs");
-const router = express.Router();
+const express = require('express')
+const fs = require('fs')
+const router = express.Router()
 
 // Route dosyalarını filtrele
-const routeFiles = fs.readdirSync(__dirname)
-  .filter(file => {
-    return file.indexOf(".js") !== -1 && 
-           file !== "index.js" && 
-           file.endsWith("Route.js");
-  });
+const routeFiles = fs.readdirSync(__dirname).filter(file => {
+  return (
+    file.indexOf('.js') !== -1 &&
+    file !== 'index.js' &&
+    file.endsWith('Route.js')
+  )
+})
 
 routeFiles.forEach(file => {
   try {
-    const route = require(`./${file}`);
-    
-    const routePath = file.replace('Route.js', '').toLowerCase();
+    const route = require(`./${file}`)
 
-    router.use(`/${routePath}`, route);
+    const routePath = file.replace('Route.js', '').toLowerCase()
 
-    console.log(`✅ Route yüklendi: /api/${routePath} -> ${file}`);
+    router.use(`/${routePath}`, route)
+
+    // console.log(`✅ Route yüklendi: /api/${routePath} -> ${file}`);
   } catch (error) {
-    console.error(`❌ Route yüklenirken hata oluştu: ${file}`, error);
+    console.error(`❌ Route yüklenirken hata oluştu: ${file}`, error)
   }
-});
+})
 
-module.exports = router;
+module.exports = router
