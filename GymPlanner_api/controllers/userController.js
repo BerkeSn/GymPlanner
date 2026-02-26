@@ -241,6 +241,15 @@ exports.addFriend = async (req, res) => {
       receiverId
     })
 
+    if (req.io) {
+      req.io.to(receiverId.toString()).emit('new_friend_request', {
+        title: 'Yeni İstek!',
+        message: 'Biri seninle idman yapmak istiyor !',
+        requesterId: requesterId,
+        friendshipId: newRequest.id // İsteği kabul/reddet yaparken bu ID lazım olacak
+      })
+    }
+
     res.status(201).json({
       success: true,
       message: 'Arkadaşlık isteği başarıyla gönderildi!',
@@ -264,7 +273,7 @@ exports.respondToRequest = async (req, res) => {
     if (!['accepted', 'rejected'].includes(status)) {
       return res
         .status(400)
-        .json({ success: false, message: 'Geçersiz durum kanka.' })
+        .json({ success: false, message: 'Geçersiz durum.' })
     }
 
     const friendship = await db.Friendship.findOne({
@@ -280,6 +289,24 @@ exports.respondToRequest = async (req, res) => {
 
     friendship.status = status
     await friendship.save()
+
+    if (req.io) {
+      const eventName =
+        status === 'accepted'
+          ? 'friend_request_accepted'
+          : 'friend_request_rejected'
+      const notificationMessage =
+        status === 'accepted'
+          ? 'Bir arkadaşlık isteğin kabul edildi! Artık beraber idman yapabilirsiniz. 🤝'
+          : 'Arkadaşlık isteğin reddedildi.'
+
+      req.io.to(friendship.requesterId.toString()).emit(eventName, {
+        friendshipId: friendship.id,
+        responderId: userId,
+        status: status,
+        message: notificationMessage
+      })
+    }
 
     res.status(200).json({
       success: true,

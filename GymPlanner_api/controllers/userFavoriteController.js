@@ -59,7 +59,7 @@ exports.getMyFavorites = async (req, res) => {
       success: true,
       count: favorites.length,
       favorites,
-      message: 'Favorilerin başarıyla getirildi Kanka.'
+      message: 'Favorilerin başarıyla getirildi.'
     })
   } catch (error) {
     console.error('Get Favorites Hatası:', error)

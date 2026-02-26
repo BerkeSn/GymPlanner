@@ -59,7 +59,7 @@ exports.createMeasurement = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Ölçümler başarıyla kaydedildi Boss!',
+      message: 'Ölçümler başarıyla kaydedildi!',
       measurement: newMeasurement
     })
   } catch (error) {
@@ -90,7 +90,7 @@ exports.updateBodyMeasurement = async (req, res) => {
     if (!measurement) {
       return res.status(404).json({
         success: false,
-        message: 'Ölçüm kaydı bulunamadı veya sana ait değil Boss.'
+        message: 'Ölçüm kaydı bulunamadı veya sana ait değil.'
       })
     }
 
