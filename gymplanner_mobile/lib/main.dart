@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gymplanner_mobile/common/color_extension.dart';
-import 'package:gymplanner_mobile/view/on_boarding/on_boarding_view.dart';
+import 'package:gymplanner_mobile/view/on_boarding/started_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         primaryColor: TColor.primaryColor1,
         fontFamily: "Poppins"
       ),
-      home: const OnBoardingView(),
+      home: const StartedView(),
     );
   }
 }
