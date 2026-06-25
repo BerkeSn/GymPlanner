@@ -62,7 +62,7 @@ const PORT = process.env.PORT || 3000
 db.sequelize.sync({ alter: true }).then(() => {
   console.log('✅ Veritabanı senkronize.')
 
-  app.listen(PORT, () => {
-    console.log(`🚀 Sunucu http://localhost:${PORT} portunda çalışıyor.`)
+  server.listen(PORT, () => {
+    console.log(`🚀 Sunucu http://0.0.0.0:${PORT} portunda çalışıyor.`)
   })
 })
