@@ -13,28 +13,19 @@ class AuthRepository {
     try {
       final response = await _dio.post(
         ApiConstants.login,
-        data: {
-          'loginInput': loginInput,
-          'password': password,
-        },
+        data: {'loginInput': loginInput, 'password': password},
       );
 
       final data = response.data;
 
       if (data['success'] == true) {
-        await TokenStorage.saveToken(
-          data['token'],
-        );
-        await TokenStorage.saveUserId(
-          data['user']['id'].toString(),
-        );
+        await TokenStorage.saveToken(data['token']);
+        await TokenStorage.saveUserId(data['user']['id'].toString());
       }
 
       return data;
     } on DioException catch (e) {
-      final message =
-          e.response?.data['message'] ??
-          'Bir hata oluştu.';
+      final message = e.response?.data['message'] ?? 'Bir hata oluştu.';
       throw Exception(message);
     }
   }
@@ -59,27 +50,21 @@ class AuthRepository {
           'name': name,
           'surname': surname,
           'gender': gender,
-          'phone': ?phone,
-          'birthdate': ?birthdate,
+          'phone': phone ?? '',
+          'birthdate': birthdate ?? '',
         },
       );
 
       final data = response.data;
 
       if (data['token'] != null) {
-        await TokenStorage.saveToken(
-          data['token'],
-        );
-        await TokenStorage.saveUserId(
-          data['user']['id'].toString(),
-        );
+        await TokenStorage.saveToken(data['token']);
+        await TokenStorage.saveUserId(data['user']['id'].toString());
       }
 
       return data;
     } on DioException catch (e) {
-      final message =
-          e.response?.data['message'] ??
-          'Bir hata oluştu.';
+      final message = e.response?.data['message'] ?? 'Bir hata oluştu.';
       throw Exception(message);
     }
   }

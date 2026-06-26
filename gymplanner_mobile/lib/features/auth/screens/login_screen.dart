@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymplanner_mobile/core/constants/app_colors.dart';
 import 'package:gymplanner_mobile/core/constants/app_text_styles.dart';
 import 'package:gymplanner_mobile/features/auth/providers/auth_provider.dart';
+import 'package:gymplanner_mobile/features/auth/screens/register_screen.dart';
+import 'package:gymplanner_mobile/main_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -44,11 +46,10 @@ class _LoginScreenState
     if (!mounted) return;
 
     if (success) {
-      // İleride go_router ile home'a yönlendireceğiz
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Giriş başarılı! 💪'),
-          backgroundColor: AppColors.success,
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => const MainScreen(),
         ),
       );
     }
@@ -202,13 +203,13 @@ class _LoginScreenState
                     ),
                     TextButton(
                       onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (_) =>
-                        //         const RegisterScreen(),
-                        //   ),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const RegisterScreen(),
+                          ),
+                        );
                       },
                       child: const Text(
                         'Kayıt Ol',

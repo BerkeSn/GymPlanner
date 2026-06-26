@@ -7,7 +7,7 @@ class ApiConstants {
   // Deploy ettikten sonra         → https://your-domain.com
 
   static const String baseUrl =
-      'http://:3000/api';
+      'https://gymplanner-80ny.onrender.com/api/';
 
   // --- Auth ---
   static const String register = '/user/register';

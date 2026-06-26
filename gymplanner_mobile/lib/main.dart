@@ -6,9 +6,7 @@ import 'package:gymplanner_mobile/features/auth/screens/login_screen.dart';
 
 void main() {
   runApp(
-    const ProviderScope(
-      child: GymPlannerApp(),
-    ),
+    const ProviderScope(child: GymPlannerApp()),
   );
 }
 
@@ -16,7 +14,10 @@ class GymPlannerApp extends ConsumerWidget {
   const GymPlannerApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     final isDarkMode = ref.watch(themeProvider);
 
     return MaterialApp(
@@ -24,7 +25,9 @@ class GymPlannerApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      themeMode: isDarkMode
+          ? ThemeMode.dark
+          : ThemeMode.light,
       home: const LoginScreen(),
     );
   }
