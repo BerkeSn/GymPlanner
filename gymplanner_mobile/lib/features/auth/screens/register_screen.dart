@@ -59,7 +59,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Kayıt başarılı! Hoş geldin 💪'),
+          content: Text('Kayıt başarılı! Hoş geldin'),
           backgroundColor: AppColors.success,
         ),
       );

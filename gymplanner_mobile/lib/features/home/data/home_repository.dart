@@ -11,11 +11,10 @@ class HomeRepository {
   Future<List<WorkoutLogModel>>
   _getWorkoutLogs() async {
     try {
-      final response = await _dio.get(  
+      final response = await _dio.get(
         ApiConstants.getWorkoutLogs,
       );
-      final List data =
-          response.data ?? [];
+      final List data = response.data ?? [];
       return data
           .map((e) => WorkoutLogModel.fromJson(e))
           .toList();
