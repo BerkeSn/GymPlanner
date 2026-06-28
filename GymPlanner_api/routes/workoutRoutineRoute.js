@@ -36,4 +36,4 @@ router.delete(
   workoutRoutineRoute.deleteWorkoutRoutine
 )
 
-router.module.exports = router
+module.exports = router
