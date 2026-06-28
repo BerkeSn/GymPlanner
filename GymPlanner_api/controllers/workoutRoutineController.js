@@ -36,7 +36,7 @@ exports.getWorkoutRoutines = async (req, res) => {
     const userId = req.user.id
 
     const workoutRoutines = await db.WorkoutRoutine.findAll({
-      where: { userId, isActive: true },
+      where: { userId },
       include: [
         {
           model: db.RoutineExercise,
@@ -64,7 +64,7 @@ exports.getWorkoutRoutineById = async (req, res) => {
     const userId = req.user.id
     const { id } = req.params
     const workoutRoutine = await db.WorkoutRoutine.findOne({
-      where: { id, userId, isActive: true },
+      where: { id, userId },
       include: [
         {
           model: db.RoutineExercise,
@@ -87,6 +87,62 @@ exports.getWorkoutRoutineById = async (req, res) => {
     }
 
     res.status(200).json({ success: true, workoutRoutine })
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message })
+  }
+}
+
+exports.deleteWorkoutRoutine = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const { id } = req.params
+
+    const workoutRoutine = await db.WorkoutRoutine.findOne({
+      where: { id, userId }
+    })
+
+    if (!workoutRoutine) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Workout routine not found.' })
+    }
+
+    await workoutRoutine.destroy()
+
+    res
+      .status(200)
+      .json({ success: true, message: 'Workout routine deleted successfully.' })
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message })
+  }
+}
+
+exports.updateWorkoutRoutine = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const { id } = req.params
+    const { name, description } = req.body
+
+    const workoutRoutine = await db.WorkoutRoutine.findOne({
+      where: { id, userId }
+    })
+
+    if (!workoutRoutine) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Workout routine not found.' })
+    }
+
+    const isActive =
+      req.body.isActive !== undefined
+        ? req.body.isActive
+        : workoutRoutine.isActive
+
+    await workoutRoutine.update({ name, description, isActive })
+
+    res
+      .status(200)
+      .json({ success: true, message: 'Workout routine updated successfully.' })
   } catch (error) {
     res.status(500).json({ success: false, error: error.message })
   }
