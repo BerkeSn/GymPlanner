@@ -1,21 +1,32 @@
-const express = require('express');
-const router = express.Router();
-const routineExerciseRoute = require('../controllers/routineExerciseController');
-const auth = require('../middleware/authMiddleware');
-const { authLimiter } = require('../middleware/limiter');
+const express = require('express')
+const router = express.Router()
+const routineExerciseRoute = require('../controllers/routineExerciseController')
+const auth = require('../middleware/authMiddleware')
+const { authLimiter } = require('../middleware/limiter')
 
 router.post(
-    '/addExerciseToRoutine/:routineId',
-    auth,
-    // authLimiter,
-    routineExerciseRoute.addExerciseToRoutine
-);
+  '/addExerciseToRoutine/:routineId',
+  auth,
+  // authLimiter,
+  routineExerciseRoute.addExerciseToRoutine
+)
 
 router.get(
-    '/getExercisesByRoutineId/:routineId',
-    auth,
-    routineExerciseRoute.getExercisesByRoutineId
-);
+  '/getExercisesByRoutineId/:routineId',
+  auth,
+  routineExerciseRoute.getExercisesByRoutineId
+)
 
+router.post(
+  '/updateRoutineExercise/:routineExerciseId',
+  auth,
+  routineExerciseRoute.updateRoutineExercise
+)
 
-module.exports = router;
+router.delete(
+  '/deleteRoutineExercise/:routineExerciseId',
+  auth,
+  routineExerciseRoute.deleteRoutineExercise
+)
+
+module.exports = router
