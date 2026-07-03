@@ -101,7 +101,9 @@ class WorkoutRepository {
   }
 
   // 5. Program sil
-  Future<void> deleteWorkoutRoutine(int id) async {
+  Future<void> deleteWorkoutRoutine(
+    int id,
+  ) async {
     try {
       await _dio.delete(
         '${ApiConstants.deleteWorkoutRoutine}/$id',
@@ -110,6 +112,46 @@ class WorkoutRepository {
       final message =
           e.response?.data['message'] ??
           'Rutin silinemedi.';
+      throw Exception(message);
+    }
+  }
+
+  // delete routineExercises
+  Future<void> deleteRoutineExercise(
+    int routineExerciseId,
+  ) async {
+    try {
+      await _dio.delete(
+        '${ApiConstants.deleteRoutineExercise}/$routineExerciseId',
+      );
+    } on DioException catch (e) {
+      final message =
+          e.response?.data['message'] ??
+          'Rutin egzersizi silinemedi.';
+      throw Exception(message);
+    }
+  }
+
+  // update routineExercises
+  Future<void> updateRoutineExercise({
+    required int routineExerciseId,
+    String? day,
+    int? targetSets,
+    int? targetReps,
+  }) async {
+    try {
+      await _dio.post(
+        '${ApiConstants.updateRoutineExercise}/$routineExerciseId',
+        data: {
+          'day': ?day,
+          'targetSets': ?targetSets,
+          'targetReps': ?targetReps,
+        },
+      );
+    } on DioException catch (e) {
+      final message =
+          e.response?.data['message'] ??
+          'Rutin egzersizi güncellenemedi.';
       throw Exception(message);
     }
   }

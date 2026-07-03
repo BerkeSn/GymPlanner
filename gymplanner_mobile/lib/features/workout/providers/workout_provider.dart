@@ -14,23 +14,29 @@ class WorkoutState {
   final List<WorkoutRoutineDetailModel> routines;
   final bool isLoading;
   final String? errorMessage;
+  final WorkoutRoutineDetailModel?
+  selectedRoutine;
 
   WorkoutState({
     required this.routines,
     required this.isLoading,
     required this.errorMessage,
+    this.selectedRoutine,
   });
 
   WorkoutState copyWith({
     List<WorkoutRoutineDetailModel>? routines,
     bool? isLoading,
     String? errorMessage,
+    WorkoutRoutineDetailModel? selectedRoutine,
   }) {
     return WorkoutState(
       routines: routines ?? this.routines,
       isLoading: isLoading ?? this.isLoading,
       errorMessage:
           errorMessage ?? this.errorMessage,
+      selectedRoutine:
+          selectedRoutine ?? this.selectedRoutine,
     );
   }
 }
@@ -45,6 +51,7 @@ class WorkoutNotifier
           routines: const [],
           isLoading: false,
           errorMessage: null,
+          selectedRoutine: null,
         ),
       );
 
@@ -178,6 +185,87 @@ class WorkoutNotifier
     });
 
     return sortedRoutines;
+  }
+
+  Future<void> getRoutineById(int id) async {
+    state = state.copyWith(
+      isLoading: true,
+      errorMessage: null,
+    );
+    try {
+      final routine = await _repository
+          .getWorkoutRoutineById(id);
+      state = state.copyWith(
+        selectedRoutine: routine,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString().replaceAll(
+          'Exception: ',
+          '',
+        ),
+      );
+    }
+  }
+
+  Future<void> deleteRoutineExercise({
+    required int routineExerciseId,
+    required int routineId,
+  }) async {
+    state = state.copyWith(
+      isLoading: true,
+      errorMessage: null,
+    );
+    try {
+      await _repository.deleteRoutineExercise(
+        routineExerciseId,
+      );
+      await getRoutineById(
+        routineId,
+      ); // listeyi yenile
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString().replaceAll(
+          'Exception: ',
+          '',
+        ),
+      );
+    }
+  }
+
+  Future<void> updateRoutineExercise({
+    required int routineExerciseId,
+    required int routineId,
+    String? day,
+    int? targetSets,
+    int? targetReps,
+  }) async {
+    state = state.copyWith(
+      isLoading: true,
+      errorMessage: null,
+    );
+    try {
+      await _repository.updateRoutineExercise(
+        routineExerciseId: routineExerciseId,
+        day: day,
+        targetSets: targetSets,
+        targetReps: targetReps,
+      );
+      await getRoutineById(
+        routineId,
+      ); // listeyi yenile
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString().replaceAll(
+          'Exception: ',
+          '',
+        ),
+      );
+    }
   }
 }
 

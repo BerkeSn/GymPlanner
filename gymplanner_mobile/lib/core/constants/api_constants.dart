@@ -60,6 +60,10 @@ class ApiConstants {
       '/routineexercise/addExerciseToRoutine';
   static const String getExercisesByRoutineId =
       '/routineexercise/getExercisesByRoutineId';
+  static const String deleteRoutineExercise =
+      '/routineexercise/deleteRoutineExercise';
+  static const String updateRoutineExercise =
+      '/routineexercise/updateRoutineExercise';
 
   // --- Antrenman Logları ---
   static const String createWorkoutLog =
