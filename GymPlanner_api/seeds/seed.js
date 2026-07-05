@@ -1,10 +1,10 @@
 const db = require('../models')
 const data = require('./exercises.json')
 
-async function run() {
+async function runSeed() {
   try {
     await db.sequelize.authenticate()
-    console.log('✅ Veritabanına bağlanıldı.')
+    console.log('Veritabanına bağlanıldı.')
 
     let created = 0
     let skipped = 0
@@ -33,12 +33,16 @@ async function run() {
       wasCreated ? created++ : skipped++
     }
 
-    console.log(`✅ Seed tamamlandı. Eklenen: ${created}, zaten var olan: ${skipped}`)
-    process.exit(0)
+    console.log(`Seed tamamlandı. Eklenen: ${created}, zaten var olan: ${skipped}`)
   } catch (error) {
-    console.error('❌ Seed hatası:', error)
-    process.exit(1)
+    console.error('Seed hatası:', error)
+    throw error; // Hataları yukarı fırlat ki çağıran yer görebilsin
   }
 }
 
-run()
+// ⬇️ EĞER DOSYA DİREKT TERMİNALDEN ÇALIŞTIRILDIYSA (Lokal Docker testi için):
+if (require.main === module) {
+  runSeed().then(() => process.exit(0)).catch(() => process.exit(1))
+}
+
+module.exports = { runSeed };

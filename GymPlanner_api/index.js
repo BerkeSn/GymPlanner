@@ -7,10 +7,12 @@ const path = require('path')
 const db = require('./models')
 require('dotenv').config()
 
+// ⬇️ SEED FONKSİYONUNU DOSYANIN BAŞINDA IMPORT EDİYORUZ
+const { runSeed } = require('./seeds/seed') 
+
 const apiRoutes = require('./routes')
 
 const app = express()
-
 const server = http.createServer(app)
 
 const io = new Server(server, {
@@ -22,7 +24,6 @@ const io = new Server(server, {
 
 // --- AYARLAR ---
 app.use(cors())
-
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
@@ -33,9 +34,7 @@ app.use((req, res, next) => {
 
 // Dosya Yükleme Middleware'i
 app.use(fileUpload())
-
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-
 app.use('/api', apiRoutes)
 
 app.get('/', (req, res) => {
@@ -59,9 +58,17 @@ io.on('connection', socket => {
 const PORT = process.env.PORT || 3000
 
 // Veritabanı Senkronizasyonu
-db.sequelize.sync({ alter: true }).then(() => {
+db.sequelize.sync({ alter: true }).then(async () => {
   console.log('✅ Veritabanı senkronize.')
 
+  // ⬇️ BURAYA EKLEDİK: Sunucu dinlemeye başlamadan önce seed fonksiyonunu tetikliyoruz
+  try {
+    await runSeed()
+  } catch (seedError) {
+    console.error('❌ Sunucu başlatılırken seed aşamasında hata oluştu:', seedError)
+  }
+
+  // Seed işlemi bittikten (veya atlattıktan) sonra sunucu ayağa kalkar
   server.listen(PORT, () => {
     console.log(`🚀 Sunucu http://0.0.0.0:${PORT} portunda çalışıyor.`)
   })
