@@ -1,0 +1,41 @@
+[
+  { "name": "Barbell Bench Press", "muscleGroup": "Chest", "equipment": "Barbell", "difficulty": "Intermediate", "description": "Sırt üstü yatarak barbell ile göğüs itiş hareketi." },
+  { "name": "Incline Dumbbell Press", "muscleGroup": "Chest", "equipment": "Dumbbell", "difficulty": "Intermediate", "description": "Eğimli bankta dambıl ile üst göğüs çalışması." },
+  { "name": "Push Up", "muscleGroup": "Chest", "equipment": "Bodyweight", "difficulty": "Beginner", "description": "Vücut ağırlığı ile şınav hareketi." },
+  { "name": "Cable Fly", "muscleGroup": "Chest", "equipment": "Cable", "difficulty": "Intermediate", "description": "Kablo makinesi ile göğüs açma hareketi." },
+  { "name": "Chest Dip", "muscleGroup": "Chest", "equipment": "Bodyweight", "difficulty": "Advanced", "description": "Paralel barda göğüs ağırlıklı dip hareketi." },
+
+  { "name": "Deadlift", "muscleGroup": "Back", "equipment": "Barbell", "difficulty": "Advanced", "description": "Barbell ile yerden kaldırma hareketi." },
+  { "name": "Pull Up", "muscleGroup": "Back", "equipment": "Bodyweight", "difficulty": "Intermediate", "description": "Barfikste kendi ağırlığıyla çekiş hareketi." },
+  { "name": "Bent Over Row", "muscleGroup": "Back", "equipment": "Barbell", "difficulty": "Intermediate", "description": "Öne eğik barbell çekiş hareketi." },
+  { "name": "Lat Pulldown", "muscleGroup": "Back", "equipment": "Machine", "difficulty": "Beginner", "description": "Kablo makinesinde lat çekiş hareketi." },
+  { "name": "Seated Cable Row", "muscleGroup": "Back", "equipment": "Cable", "difficulty": "Beginner", "description": "Oturarak kablo ile sırt çekiş hareketi." },
+
+  { "name": "Barbell Back Squat", "muscleGroup": "Legs", "equipment": "Barbell", "difficulty": "Advanced", "description": "Sırtta barbell ile çömelme hareketi." },
+  { "name": "Leg Press", "muscleGroup": "Legs", "equipment": "Machine", "difficulty": "Beginner", "description": "Makinede bacak itiş hareketi." },
+  { "name": "Romanian Deadlift", "muscleGroup": "Legs", "equipment": "Barbell", "difficulty": "Intermediate", "description": "Arka bacak zincirine odaklı ölü kaldırış varyasyonu." },
+  { "name": "Walking Lunge", "muscleGroup": "Legs", "equipment": "Dumbbell", "difficulty": "Intermediate", "description": "Dambıl ile yürüyerek hamle hareketi." },
+  { "name": "Leg Extension", "muscleGroup": "Legs", "equipment": "Machine", "difficulty": "Beginner", "description": "Makinede ön bacak izolasyon hareketi." },
+  { "name": "Leg Curl", "muscleGroup": "Legs", "equipment": "Machine", "difficulty": "Beginner", "description": "Makinede arka bacak izolasyon hareketi." },
+  { "name": "Standing Calf Raise", "muscleGroup": "Legs", "equipment": "Machine", "difficulty": "Beginner", "description": "Baldır izolasyon hareketi." },
+
+  { "name": "Overhead Press", "muscleGroup": "Shoulders", "equipment": "Barbell", "difficulty": "Intermediate", "description": "Ayakta barbell ile omuz itiş hareketi." },
+  { "name": "Dumbbell Lateral Raise", "muscleGroup": "Shoulders", "equipment": "Dumbbell", "difficulty": "Beginner", "description": "Yan omuz izolasyon hareketi." },
+  { "name": "Face Pull", "muscleGroup": "Shoulders", "equipment": "Cable", "difficulty": "Intermediate", "description": "Arka omuz ve rotator cuff için kablo hareketi." },
+  { "name": "Arnold Press", "muscleGroup": "Shoulders", "equipment": "Dumbbell", "difficulty": "Intermediate", "description": "Rotasyonlu dambıl omuz itişi." },
+
+  { "name": "Barbell Curl", "muscleGroup": "Arms", "equipment": "Barbell", "difficulty": "Beginner", "description": "Barbell ile biceps izolasyon hareketi." },
+  { "name": "Hammer Curl", "muscleGroup": "Arms", "equipment": "Dumbbell", "difficulty": "Beginner", "description": "Nötr tutuşla biceps/önkol hareketi." },
+  { "name": "Triceps Pushdown", "muscleGroup": "Arms", "equipment": "Cable", "difficulty": "Beginner", "description": "Kablo ile triceps izolasyon hareketi." },
+  { "name": "Skull Crusher", "muscleGroup": "Arms", "equipment": "Barbell", "difficulty": "Intermediate", "description": "Sırt üstü barbell ile triceps hareketi." },
+  { "name": "Dips", "muscleGroup": "Arms", "equipment": "Bodyweight", "difficulty": "Advanced", "description": "Triceps ağırlıklı paralel bar dip hareketi." },
+
+  { "name": "Plank", "muscleGroup": "Abs", "equipment": "Bodyweight", "difficulty": "Beginner", "description": "İzometrik core stabilizasyon hareketi." },
+  { "name": "Hanging Leg Raise", "muscleGroup": "Abs", "equipment": "Bodyweight", "difficulty": "Advanced", "description": "Barfikste asılı bacak kaldırma hareketi." },
+  { "name": "Cable Crunch", "muscleGroup": "Abs", "equipment": "Cable", "difficulty": "Intermediate", "description": "Diz üstü kablo ile karın hareketi." },
+  { "name": "Russian Twist", "muscleGroup": "Abs", "equipment": "Bodyweight", "difficulty": "Beginner", "description": "Oblik kaslara yönelik rotasyon hareketi." },
+
+  { "name": "Kettlebell Swing", "muscleGroup": "Legs", "equipment": "Kettlebell", "difficulty": "Intermediate", "description": "Kalça patlayıcılığı için kettlebell hareketi." },
+  { "name": "Goblet Squat", "muscleGroup": "Legs", "equipment": "Kettlebell", "difficulty": "Beginner", "description": "Kettlebell tutarak çömelme hareketi." },
+  { "name": "Resistance Band Pull Apart", "muscleGroup": "Shoulders", "equipment": "Resistance Band", "difficulty": "Beginner", "description": "Direnç bandı ile arka omuz aktivasyonu." }
+]
