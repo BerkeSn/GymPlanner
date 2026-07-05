@@ -17,4 +17,6 @@ router.post(
 router.get('/getMyFriends', auth, userController.getMyFriends)
 router.get('/getPendingRequests', auth, userController.getPendingRequests)
 
+router.get('/getProfile', auth, userController.getProfile)
+
 module.exports = router

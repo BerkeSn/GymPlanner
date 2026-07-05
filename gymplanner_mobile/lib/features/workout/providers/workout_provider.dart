@@ -267,6 +267,39 @@ class WorkoutNotifier
       );
     }
   }
+
+Future<bool> addExerciseToRoutine({
+    required int routineId,
+    required int exerciseId,
+    required String day,
+    required int targetSets,
+    required int targetReps,
+  }) async {
+    state = state.copyWith(
+      isLoading: true,
+      errorMessage: null,
+    );
+    try {
+      await _repository.addExerciseToRoutine(
+        routineId: routineId,
+        exerciseId: exerciseId,
+        day: day,
+        targetSets: targetSets,
+        targetReps: targetReps,
+      );
+      await getRoutineById(routineId);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString().replaceAll(
+          'Exception: ',
+          '',
+        ),
+      );
+      return false;
+    }
+  }
 }
 
 final workoutProvider =

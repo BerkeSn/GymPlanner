@@ -155,4 +155,29 @@ class WorkoutRepository {
       throw Exception(message);
     }
   }
+  // egzersizi rutine ekle
+  Future<void> addExerciseToRoutine({
+    required int routineId,
+    required int exerciseId,
+    required String day,
+    required int targetSets,
+    required int targetReps,
+  }) async {
+    try {
+      await _dio.post(
+        '${ApiConstants.addExerciseToRoutine}/$routineId',
+        data: {
+          'exerciseId': exerciseId,
+          'day': day,
+          'targetSets': targetSets,
+          'targetReps': targetReps,
+        },
+      );
+    } on DioException catch (e) {
+      final message =
+          e.response?.data['message'] ??
+          'Egzersiz programa eklenemedi.';
+      throw Exception(message);
+    }
+  }
 }

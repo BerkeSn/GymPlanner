@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymplanner_mobile/core/models/routine_exercise_model.dart';
+import 'package:gymplanner_mobile/features/exercise/screens/add_exercise_screen.dart';
 import 'package:gymplanner_mobile/features/workout/providers/workout_provider.dart';
 
 class WorkoutDetailScreen
@@ -165,8 +166,16 @@ class _WorkoutDetailScreenState
         ],
       ),
       body: body,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => AddExerciseScreen(
+                routineId: widget.routineId,
+              ),
+            ),
+          );
+        },
         child: const Icon(Icons.add),
       ),
     );

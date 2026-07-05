@@ -29,13 +29,5 @@ flutter:
 
    uses-material-design: true
 
-   assets:
-    - assets/img/
-
    fonts:
     - family: Poppins
-
-      fonts:
-        - asset: assets/font/Poppins-Regular.ttf
-        - asset: assets/font/Poppins-Bold.ttf
-          weight: 700

@@ -380,3 +380,22 @@ exports.getPendingRequests = async (req, res) => {
       .json({ success: false, error: 'Bekleyen istekler getirilemedi.' })
   }
 }
+
+// Get User Profile
+exports.getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const user = await db.User.findByPk(userId, {
+      attributes: { exclude: ['password'] }
+    })
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Kullanıcı bulunamadı.' })
+    }
+    
+    res.status(200).json({ success: true, user })
+  } catch (error) {
+    console.error('Get Profile Hatası:', error)
+    res.status(500).json({ success: false, message: 'Profil bilgisi alınırken bir hata oluştu.' })
+  }
+}
