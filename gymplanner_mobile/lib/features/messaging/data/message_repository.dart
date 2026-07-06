@@ -3,6 +3,16 @@ import 'package:gymplanner_mobile/core/constants/api_constants.dart';
 import 'package:gymplanner_mobile/core/models/conversation_model.dart';
 import 'package:gymplanner_mobile/core/models/message_model.dart';
 import 'package:gymplanner_mobile/core/network/dio_client.dart';
+class ChatHistoryResult {
+  final List<MessageModel> messages;
+  final Map<int, DateTime?>
+  participantLastReadAt;
+
+  ChatHistoryResult({
+    required this.messages,
+    required this.participantLastReadAt,
+  });
+}
 
 class MessageRepository {
   final Dio _dio = DioClient.instance;
@@ -47,7 +57,8 @@ class MessageRepository {
     }
   }
 
-  Future<List<MessageModel>> getMessages(
+  // getMessages fonksiyonunu bununla DEĞİŞTİR:
+  Future<ChatHistoryResult> getMessages(
     int conversationId, {
     int page = 1,
   }) async {
@@ -59,11 +70,27 @@ class MessageRepository {
           'limit': 30,
         },
       );
-      final List data =
+      final List messagesJson =
           response.data['messages'] ?? [];
-      return data
+      final List participantsJson =
+          response.data['participants'] ?? [];
+
+      final messages = messagesJson
           .map((e) => MessageModel.fromJson(e))
           .toList();
+
+      final Map<int, DateTime?> lastReadMap = {
+        for (final p in participantsJson)
+          p['userId']
+              as int: p['lastReadAt'] != null
+              ? DateTime.parse(p['lastReadAt'])
+              : null,
+      };
+
+      return ChatHistoryResult(
+        messages: messages,
+        participantLastReadAt: lastReadMap,
+      );
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??

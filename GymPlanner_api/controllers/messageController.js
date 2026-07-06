@@ -135,7 +135,17 @@ exports.getMessages = async (req, res) => {
       offset: (page - 1) * limit
     })
 
-    res.status(200).json({ success: true, messages: messages.reverse() })
+    // YENİ: karşı tarafın okundu bilgisini de döndür
+    const participants = await db.ConversationParticipant.findAll({
+      where: { conversationId },
+      attributes: ['userId', 'lastReadAt']
+    })
+
+    res.status(200).json({
+      success: true,
+      messages: messages.reverse(),
+      participants
+    })
   } catch (error) {
     console.error('Get Messages Hatası:', error)
     res.status(500).json({ success: false, error: error.message })
@@ -215,7 +225,8 @@ exports.markAsRead = async (req, res) => {
       otherParticipants.forEach(p => {
         req.io.to(p.userId.toString()).emit('message_read', {
           conversationId: Number(conversationId),
-          readerId: userId
+          readerId: userId,
+          readAt: participant.lastReadAt // YENİ
         })
       })
     }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymplanner_mobile/core/models/message_model.dart';
@@ -25,11 +27,19 @@ class _ChatScreenState
     extends ConsumerState<ChatScreen> {
   final _textController = TextEditingController();
   final _scrollController = ScrollController();
+  Timer? _typingDebounce;
+
+  ({int conversationId, int otherUserId})
+  get _providerKey => (
+    conversationId: widget.conversationId,
+    otherUserId: widget.otherUserId,
+  );
 
   @override
   void dispose() {
     _textController.dispose();
     _scrollController.dispose();
+    _typingDebounce?.cancel();
     super.dispose();
   }
 
@@ -42,16 +52,26 @@ class _ChatScreenState
     );
   }
 
+  void _onTextChanged(String _) {
+    _typingDebounce?.cancel();
+    _typingDebounce = Timer(
+      const Duration(milliseconds: 400),
+      () {
+        ref
+            .read(
+              chatProvider(_providerKey).notifier,
+            )
+            .notifyTyping(widget.otherUserId);
+      },
+    );
+  }
+
   Future<void> _send() async {
     final text = _textController.text;
     if (text.trim().isEmpty) return;
     _textController.clear();
     final success = await ref
-        .read(
-          chatProvider(
-            widget.conversationId,
-          ).notifier,
-        )
+        .read(chatProvider(_providerKey).notifier)
         .sendTextMessage(text);
     if (success) {
       WidgetsBinding.instance
@@ -72,25 +92,25 @@ class _ChatScreenState
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(
-      chatProvider(widget.conversationId),
+      chatProvider(_providerKey),
     );
     final currentUserId = _resolveUserId(
       ref.watch(authProvider).user,
     );
 
-    ref.listen(
-      chatProvider(widget.conversationId),
-      (previous, next) {
-        if (previous != null &&
-            next.messages.length >
-                previous.messages.length) {
-          WidgetsBinding.instance
-              .addPostFrameCallback(
-                (_) => _scrollToBottom(),
-              );
-        }
-      },
-    );
+    ref.listen(chatProvider(_providerKey), (
+      previous,
+      next,
+    ) {
+      if (previous != null &&
+          next.messages.length >
+              previous.messages.length) {
+        WidgetsBinding.instance
+            .addPostFrameCallback(
+              (_) => _scrollToBottom(),
+            );
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -160,9 +180,16 @@ class _ChatScreenState
         final message = state.messages[index];
         final isMine =
             message.senderId == currentUserId;
+        final isRead =
+            isMine &&
+            state.otherUserLastReadAt != null &&
+            !message.createdAt.isAfter(
+              state.otherUserLastReadAt!,
+            );
         return _MessageBubble(
           message: message,
           isMine: isMine,
+          isRead: isRead,
         );
       },
     );
@@ -180,17 +207,7 @@ class _ChatScreenState
             Expanded(
               child: TextField(
                 controller: _textController,
-                onChanged: (_) {
-                  ref
-                      .read(
-                        chatProvider(
-                          widget.conversationId,
-                        ).notifier,
-                      )
-                      .notifyTyping(
-                        widget.otherUserId,
-                      );
-                },
+                onChanged: _onTextChanged,
                 decoration: const InputDecoration(
                   hintText: 'Mesaj yaz...',
                 ),
@@ -216,10 +233,12 @@ class _ChatScreenState
 class _MessageBubble extends StatelessWidget {
   final MessageModel message;
   final bool isMine;
+  final bool isRead;
 
   const _MessageBubble({
     required this.message,
     required this.isMine,
+    this.isRead = false,
   });
 
   @override
@@ -252,9 +271,28 @@ class _MessageBubble extends StatelessWidget {
           color: color,
           borderRadius: BorderRadius.circular(14),
         ),
-        child: Text(
-          message.content ?? '',
-          style: TextStyle(color: textColor),
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              message.content ?? '',
+              style: TextStyle(color: textColor),
+            ),
+            if (isMine) ...[
+              const SizedBox(height: 2),
+              Icon(
+                isRead
+                    ? Icons.done_all
+                    : Icons.done,
+                size: 14,
+                color: isRead
+                    ? Colors.lightBlueAccent
+                    : Colors.white70,
+              ),
+            ],
+          ],
         ),
       ),
     );

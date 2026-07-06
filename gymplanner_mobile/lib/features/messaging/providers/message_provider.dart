@@ -10,10 +10,6 @@ final messageRepositoryProvider =
       (ref) => MessageRepository(),
     );
 
-// ------------------------------------------------------------
-// Sohbet Listesi
-// ------------------------------------------------------------
-
 class ConversationListState {
   final List<ConversationModel> conversations;
   final bool isLoading;
@@ -138,6 +134,7 @@ class ChatState {
   final bool isLoading;
   final bool isSending;
   final bool isOtherUserTyping;
+  final DateTime? otherUserLastReadAt;
   final String? errorMessage;
 
   const ChatState({
@@ -145,6 +142,7 @@ class ChatState {
     this.isLoading = false,
     this.isSending = false,
     this.isOtherUserTyping = false,
+    this.otherUserLastReadAt,
     this.errorMessage,
   });
 
@@ -153,6 +151,7 @@ class ChatState {
     bool? isLoading,
     bool? isSending,
     bool? isOtherUserTyping,
+    DateTime? otherUserLastReadAt,
     String? errorMessage,
     bool clearError = false,
   }) {
@@ -163,6 +162,9 @@ class ChatState {
       isOtherUserTyping:
           isOtherUserTyping ??
           this.isOtherUserTyping,
+      otherUserLastReadAt:
+          otherUserLastReadAt ??
+          this.otherUserLastReadAt,
       errorMessage: clearError
           ? null
           : (errorMessage ?? this.errorMessage),
@@ -174,10 +176,12 @@ class ChatNotifier
     extends StateNotifier<ChatState> {
   final MessageRepository _repository;
   final int conversationId;
+  final int otherUserId;
 
   ChatNotifier(
     this._repository,
     this.conversationId,
+    this.otherUserId,
   ) : super(const ChatState()) {
     SocketService.instance.on(
       'new_message',
@@ -186,6 +190,10 @@ class ChatNotifier
     SocketService.instance.on(
       'typing',
       _onTyping,
+    );
+    SocketService.instance.on(
+      'message_read',
+      _onMessageRead,
     );
     loadMessages();
   }
@@ -227,7 +235,20 @@ class ChatNotifier
     }
   }
 
-  Future<void> loadMessages() async {
+  void _onMessageRead(dynamic data) {
+    if (data['conversationId'] ==
+            conversationId &&
+        data['readerId'] == otherUserId) {
+      final readAt = data['readAt'] != null
+          ? DateTime.parse(data['readAt'])
+          : DateTime.now();
+      state = state.copyWith(
+        otherUserLastReadAt: readAt,
+      );
+    }
+  }
+/*
+Future<void> loadMessages() async {
     state = state.copyWith(
       isLoading: true,
       clearError: true,
@@ -239,6 +260,41 @@ class ChatNotifier
         messages: messages,
         isLoading: false,
       );
+      await _repository.markAsRead(
+        conversationId,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: e.toString().replaceAll(
+          'Exception: ',
+          '',
+        ),
+      );
+    }
+  }
+  */
+
+Future<void> loadMessages() async {
+    state = state.copyWith(
+      isLoading: true,
+      clearError: true,
+    );
+    try {
+      final chatHistory = await _repository
+          .getMessages(conversationId);
+
+      final otherUserReadAt = chatHistory
+          .participantLastReadAt[otherUserId];
+
+      state = state.copyWith(
+        messages: chatHistory
+            .messages,
+        otherUserLastReadAt:
+            otherUserReadAt,
+        isLoading: false,
+      );
+
       await _repository.markAsRead(
         conversationId,
       );
@@ -302,6 +358,10 @@ class ChatNotifier
       'typing',
       _onTyping,
     );
+    SocketService.instance.off(
+      'message_read',
+      _onMessageRead,
+    );
     super.dispose();
   }
 }
@@ -310,10 +370,11 @@ final chatProvider =
     StateNotifierProvider.family<
       ChatNotifier,
       ChatState,
-      int
+      ({int conversationId, int otherUserId})
     >(
-      (ref, conversationId) => ChatNotifier(
+      (ref, args) => ChatNotifier(
         ref.watch(messageRepositoryProvider),
-        conversationId,
+        args.conversationId,
+        args.otherUserId,
       ),
     );

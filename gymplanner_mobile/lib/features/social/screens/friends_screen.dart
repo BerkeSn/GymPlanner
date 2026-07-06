@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gymplanner_mobile/features/messaging/providers/message_provider.dart';
+import 'package:gymplanner_mobile/features/messaging/screens/chat_screen.dart';
 import 'package:gymplanner_mobile/features/social/providers/social_provider.dart';
 import 'package:gymplanner_mobile/features/social/screens/requests_screen.dart';
 
@@ -185,6 +187,52 @@ class _FriendsScreenState
               ),
             ),
             title: Text(friend.username),
+            trailing: IconButton(
+              icon: const Icon(
+                Icons.message_outlined,
+              ),
+              onPressed: () async {
+                final conversationId = await ref
+                    .read(
+                      conversationListProvider
+                          .notifier,
+                    )
+                    .startConversationWith(
+                      friend.id,
+                    );
+
+                if (!context.mounted) return;
+
+                if (conversationId != null) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ChatScreen(
+                        conversationId:
+                            conversationId,
+                        otherUserId: friend.id,
+                        otherUserName:
+                            friend.username,
+                      ),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        ref
+                                .read(
+                                  conversationListProvider,
+                                )
+                                .errorMessage ??
+                            'Sohbet başlatılamadı.',
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
           ),
         );
       },
