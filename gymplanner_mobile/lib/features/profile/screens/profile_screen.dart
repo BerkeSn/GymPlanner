@@ -6,6 +6,7 @@ import 'package:gymplanner_mobile/core/models/user_model.dart';
 import 'package:gymplanner_mobile/features/auth/providers/auth_provider.dart';
 import 'package:gymplanner_mobile/features/auth/screens/login_screen.dart';
 import 'package:gymplanner_mobile/features/profile/providers/profile_provider.dart';
+import 'package:gymplanner_mobile/features/social/screens/friends_screen.dart';
 
 class ProfileScreen
     extends ConsumerStatefulWidget {
@@ -141,7 +142,24 @@ class _ProfileScreenState
     final state = ref.watch(profileProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profil')),
+      appBar: AppBar(
+        title: const Text('Profil'),
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.group_outlined,
+            ),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const FriendsScreen(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: _buildBody(state),
     );
   }

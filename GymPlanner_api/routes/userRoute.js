@@ -18,5 +18,6 @@ router.get('/getMyFriends', auth, userController.getMyFriends)
 router.get('/getPendingRequests', auth, userController.getPendingRequests)
 
 router.get('/getProfile', auth, userController.getProfile)
+router.get('/searchUsers', auth, userController.searchUsers)
 
 module.exports = router

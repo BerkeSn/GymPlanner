@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymplanner_mobile/core/theme/app_theme.dart';
 import 'package:gymplanner_mobile/core/theme/theme_notifier.dart';
-import 'package:gymplanner_mobile/features/auth/screens/login_screen.dart';
+import 'package:gymplanner_mobile/features/auth/screens/splash_screen.dart';
 
 void main() {
   runApp(
@@ -19,7 +19,6 @@ class GymPlannerApp extends ConsumerWidget {
     WidgetRef ref,
   ) {
     final isDarkMode = ref.watch(themeProvider);
-
     return MaterialApp(
       title: 'GymPlanner',
       debugShowCheckedModeBanner: false,
@@ -28,7 +27,7 @@ class GymPlannerApp extends ConsumerWidget {
       themeMode: isDarkMode
           ? ThemeMode.dark
           : ThemeMode.light,
-      home: const LoginScreen(),
+      home: const SplashScreen(),
     );
   }
 }

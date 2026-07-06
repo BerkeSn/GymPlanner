@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:gymplanner_mobile/core/network/socket_service.dart';
+import 'package:gymplanner_mobile/core/network/token_storage.dart';
 import 'package:gymplanner_mobile/features/auth/data/auth_repository.dart';
 
 // Repository provider
@@ -48,6 +50,17 @@ class AuthNotifier
   AuthNotifier(this._repository)
     : super(const AuthState());
 
+  void _connectSocket(
+    Map<String, dynamic>? user,
+  ) {
+    final id = user?['id'];
+    if (id != null) {
+      SocketService.instance.connect(
+        id.toString(),
+      );
+    }
+  }
+
   Future<bool> login({
     required String loginInput,
     required String password,
@@ -64,6 +77,7 @@ class AuthNotifier
         status: AuthStatus.success,
         user: data['user'],
       );
+      _connectSocket(data['user']);
       return true;
     } catch (e) {
       state = state.copyWith(
@@ -105,6 +119,7 @@ class AuthNotifier
         status: AuthStatus.success,
         user: data['user'],
       );
+      _connectSocket(data['user']);
       return true;
     } catch (e) {
       state = state.copyWith(
@@ -118,17 +133,37 @@ class AuthNotifier
     }
   }
 
+  Future<bool> tryAutoLogin() async {
+    final hasToken = await TokenStorage.isLoggedIn();
+    if (!hasToken) {
+      return false;
+    }
+
+    state = state.copyWith(status: AuthStatus.loading);
+    try {
+      final user = await _repository.getProfile();
+      state = state.copyWith(
+        status: AuthStatus.success,
+        user: user,
+      );
+      _connectSocket(user);
+      return true;
+    } catch (e) {
+      await _repository.logout();
+      state = const AuthState();
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     await _repository.logout();
+    SocketService.instance.disconnect();
     state = const AuthState();
   }
 }
 
 final authProvider =
-    StateNotifierProvider<
-      AuthNotifier,
-      AuthState
-    >(
+    StateNotifierProvider<AuthNotifier, AuthState>(
       (ref) => AuthNotifier(
         ref.watch(authRepositoryProvider),
       ),

@@ -399,3 +399,28 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ success: false, message: 'Profil bilgisi alınırken bir hata oluştu.' })
   }
 }
+
+exports.searchUsers = async (req, res) => {
+  try {
+    const currentUserId = req.user.id
+    const { query } = req.query
+
+    if (!query || query.trim().length < 2) {
+      return res.status(400).json({ success: false, message: 'En az 2 karakter girin.' })
+    }
+
+    const users = await db.User.findAll({
+      where: {
+        id: { [Op.ne]: currentUserId },
+        username: { [Op.iLike]: `%${query.trim()}%` }
+      },
+      attributes: ['id', 'username', 'name', 'surname'],
+      limit: 20
+    })
+
+    res.status(200).json({ success: true, users })
+  } catch (error) {
+    console.error('Search Users Hatası:', error)
+    res.status(500).json({ success: false, message: 'Kullanıcı aranırken bir hata oluştu.' })
+  }
+}

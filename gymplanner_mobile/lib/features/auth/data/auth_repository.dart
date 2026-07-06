@@ -69,6 +69,17 @@ class AuthRepository {
     }
   }
 
+  Future<Map<String, dynamic>> getProfile() async {
+    try {
+      final response = await _dio.get(ApiConstants.getProfile);
+      return response.data['user'] as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final message =
+          e.response?.data['message'] ?? 'Profil bilgisi alınamadı.';
+      throw Exception(message);
+    }
+  }
+
   Future<void> logout() async {
     await TokenStorage.clearAll();
   }

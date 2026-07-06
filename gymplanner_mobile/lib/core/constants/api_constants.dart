@@ -14,7 +14,8 @@ class ApiConstants {
   static const String login = '/user/login';
   static const String updateProfile =
       '/user/update';
-  static const String getProfile = '/user/getProfile';
+  static const String getProfile =
+      '/user/getProfile';
 
   // --- Arkadaşlık ---
   static const String addFriend =
@@ -25,6 +26,8 @@ class ApiConstants {
       '/user/getMyFriends';
   static const String getPendingRequests =
       '/user/getPendingRequests';
+  static const String searchUsers =
+      '/user/searchUsers';
 
   // --- Egzersizler ---
   static const String getAllExercises =
@@ -93,6 +96,4 @@ class ApiConstants {
       '/userfavorite/toggleFavorite';
   static const String getMyFavorites =
       '/userfavorite/getMyFavorites';
-
-    
 }
