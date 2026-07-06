@@ -26,7 +26,8 @@ class WorkoutRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
-          'Rutinler alınamadı.';
+          e.message ??
+          'Bir hata oluştu.';
       throw Exception(message);
     }
   }
@@ -46,7 +47,8 @@ class WorkoutRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
-          'Rutin detayları alınamadı.';
+          e.message ??
+          'Bir hata oluştu.';
       throw Exception(message);
     }
   }
@@ -70,6 +72,7 @@ class WorkoutRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Rutin oluşturulamadı.';
       throw Exception(message);
     }
@@ -95,6 +98,7 @@ class WorkoutRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Rutin güncellenemedi.';
       throw Exception(message);
     }
@@ -111,6 +115,7 @@ class WorkoutRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Rutin silinemedi.';
       throw Exception(message);
     }
@@ -127,6 +132,7 @@ class WorkoutRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Rutin egzersizi silinemedi.';
       throw Exception(message);
     }
@@ -151,10 +157,12 @@ class WorkoutRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Rutin egzersizi güncellenemedi.';
       throw Exception(message);
     }
   }
+
   // egzersizi rutine ekle
   Future<void> addExerciseToRoutine({
     required int routineId,
@@ -176,6 +184,7 @@ class WorkoutRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Egzersiz programa eklenemedi.';
       throw Exception(message);
     }

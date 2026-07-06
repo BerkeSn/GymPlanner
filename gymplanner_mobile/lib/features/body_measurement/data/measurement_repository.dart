@@ -23,7 +23,8 @@ class MeasurementRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
-          'Ölçümler alınamadı.';
+          e.message ??
+          'Bir hata oluştu.';
       throw Exception(message);
     }
   }
@@ -57,6 +58,7 @@ class MeasurementRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Ölçüm kaydedilemedi.';
       throw Exception(message);
     }
@@ -92,6 +94,7 @@ class MeasurementRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Ölçüm güncellenemedi.';
       throw Exception(message);
     }
@@ -106,7 +109,8 @@ class MeasurementRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
-          'Ölçüm silinemedi.';
+          e.message ??
+          'Bir hata oluştu.';
       throw Exception(message);
     }
   }

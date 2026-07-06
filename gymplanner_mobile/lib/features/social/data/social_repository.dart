@@ -21,7 +21,8 @@ class SocialRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
-          'Arkadaşlar alınamadı.';
+          e.message ??
+          'Bir hata oluştu.';
       throw Exception(message);
     }
   }
@@ -42,6 +43,7 @@ class SocialRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Bekleyen istekler alınamadı.';
       throw Exception(message);
     }
@@ -57,6 +59,7 @@ class SocialRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'İstek gönderilemedi.';
       throw Exception(message);
     }
@@ -75,7 +78,8 @@ class SocialRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
-          'İstek yanıtlanamadı.';
+          e.message ??
+          'Bir hata oluştu.';
       throw Exception(message);
     }
   }
@@ -99,6 +103,7 @@ class SocialRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Kullanıcı aranamadı.';
       throw Exception(message);
     }

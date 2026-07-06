@@ -27,12 +27,10 @@ class _AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     final token = await TokenStorage.getToken();
-
     if (token != null) {
       options.headers['Authorization'] =
           'Bearer $token';
     }
-
     handler.next(options);
   }
 
@@ -41,18 +39,30 @@ class _AuthInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) {
+    String? friendlyMessage;
     switch (err.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.receiveTimeout:
-        throw Exception(
-          'Sunucuya bağlanılamadı. Lütfen tekrar deneyin.',
-        );
+      case DioExceptionType.sendTimeout:
+        friendlyMessage =
+            'Sunucuya bağlanılamadı. Lütfen tekrar deneyin.';
+        break;
       case DioExceptionType.connectionError:
-        throw Exception(
-          'İnternet bağlantınızı kontrol edin.',
-        );
+        friendlyMessage =
+            'İnternet bağlantınızı kontrol edin.';
+        break;
       default:
-        handler.next(err);
+        break;
     }
+
+    handler.next(
+      DioException(
+        requestOptions: err.requestOptions,
+        response: err.response,
+        type: err.type,
+        error: err.error,
+        message: friendlyMessage ?? err.message,
+      ),
+    );
   }
 }

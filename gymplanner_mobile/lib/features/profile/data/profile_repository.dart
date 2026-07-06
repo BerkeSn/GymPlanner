@@ -16,7 +16,8 @@ class ProfileRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
-          'Profil bilgisi alınamadı.';
+          e.message ??
+          'Bir hata oluştu.';
       throw Exception(message);
     }
   }
@@ -51,6 +52,7 @@ class ProfileRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Profil güncellenemedi.';
       throw Exception(message);
     }

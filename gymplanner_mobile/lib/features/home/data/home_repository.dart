@@ -21,7 +21,8 @@ class HomeRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
-          'Antrenman logları alınamadı.';
+          e.message ??
+          'Bir hata oluştu.';
       throw Exception(message);
     }
   }
@@ -43,6 +44,7 @@ class HomeRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Rutinler alınamadı.';
       throw Exception(message);
     }
@@ -65,6 +67,7 @@ class HomeRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Ölçümler alınamadı.';
       throw Exception(message);
     }

@@ -13,19 +13,29 @@ class AuthRepository {
     try {
       final response = await _dio.post(
         ApiConstants.login,
-        data: {'loginInput': loginInput, 'password': password},
+        data: {
+          'loginInput': loginInput,
+          'password': password,
+        },
       );
 
       final data = response.data;
 
       if (data['success'] == true) {
-        await TokenStorage.saveToken(data['token']);
-        await TokenStorage.saveUserId(data['user']['id'].toString());
+        await TokenStorage.saveToken(
+          data['token'],
+        );
+        await TokenStorage.saveUserId(
+          data['user']['id'].toString(),
+        );
       }
 
       return data;
     } on DioException catch (e) {
-      final message = e.response?.data['message'] ?? 'Bir hata oluştu.';
+      final message =
+          e.response?.data['message'] ??
+          e.message ??
+          'Bir hata oluştu.';
       throw Exception(message);
     }
   }
@@ -50,32 +60,52 @@ class AuthRepository {
           'name': name,
           'surname': surname,
           'gender': gender,
-          'phone': phone ?? '',
-          'birthdate': birthdate ?? '',
+          'phone':
+              (phone == null || phone.isEmpty)
+              ? null
+              : phone,
+          'birthdate':
+              (birthdate == null ||
+                  birthdate.isEmpty)
+              ? null
+              : birthdate,
         },
       );
 
       final data = response.data;
 
       if (data['token'] != null) {
-        await TokenStorage.saveToken(data['token']);
-        await TokenStorage.saveUserId(data['user']['id'].toString());
+        await TokenStorage.saveToken(
+          data['token'],
+        );
+        await TokenStorage.saveUserId(
+          data['user']['id'].toString(),
+        );
       }
 
       return data;
     } on DioException catch (e) {
-      final message = e.response?.data['message'] ?? 'Bir hata oluştu.';
+      final message =
+          e.response?.data['message'] ??
+          e.message ??
+          'Bir hata oluştu.';
       throw Exception(message);
     }
   }
 
-  Future<Map<String, dynamic>> getProfile() async {
+  Future<Map<String, dynamic>>
+  getProfile() async {
     try {
-      final response = await _dio.get(ApiConstants.getProfile);
-      return response.data['user'] as Map<String, dynamic>;
+      final response = await _dio.get(
+        ApiConstants.getProfile,
+      );
+      return response.data['user']
+          as Map<String, dynamic>;
     } on DioException catch (e) {
       final message =
-          e.response?.data['message'] ?? 'Profil bilgisi alınamadı.';
+          e.response?.data['message'] ??
+          e.message ??
+          'Profil bilgisi alınamadı.';
       throw Exception(message);
     }
   }

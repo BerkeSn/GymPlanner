@@ -23,7 +23,8 @@ class ExerciseRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
-          'Kas grupları alınamadı.';
+          e.message ??
+          'Bir hata oluştu.';
       throw Exception(message);
     }
   }
@@ -44,6 +45,7 @@ class ExerciseRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Egzersizler alınamadı.';
       throw Exception(message);
     }
@@ -66,6 +68,7 @@ class ExerciseRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Favoriler alınamadı.';
       throw Exception(message);
     }
@@ -84,6 +87,7 @@ class ExerciseRepository {
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
+          e.message ??
           'Favori işlemi başarısız.';
       throw Exception(message);
     }
