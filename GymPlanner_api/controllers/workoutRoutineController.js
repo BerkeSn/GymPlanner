@@ -138,12 +138,26 @@ exports.updateWorkoutRoutine = async (req, res) => {
         ? req.body.isActive
         : workoutRoutine.isActive
 
-    await workoutRoutine.update({ name, description, isActive })
+    const updatedName =
+      name !== undefined && name !== null ? name : workoutRoutine.name
+
+    const updatedDescription =
+      description !== undefined ? description : workoutRoutine.description
+
+    await workoutRoutine.update({
+      name: updatedName,
+      description: updatedDescription,
+      isActive
+    })
 
     res
       .status(200)
       .json({ success: true, message: 'Workout routine updated successfully.' })
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message })
+    res.status(500).json({
+      success: false,
+      message: 'Program güncellenirken bir hata oluştu.',
+      error: error.message
+    })
   }
 }
