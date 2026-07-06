@@ -51,6 +51,7 @@ class _WorkoutListScreenState
       ),
       body: _buildBody(state),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'add_routine',
         onPressed: _showCreateDialog,
         child: const Icon(Icons.add),
       ),

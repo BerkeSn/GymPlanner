@@ -167,6 +167,7 @@ class _WorkoutDetailScreenState
       ),
       body: body,
         floatingActionButton: FloatingActionButton(
+        heroTag: 'add_exercise',
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(

@@ -38,13 +38,25 @@ class SocketService {
     _socket?.on(event, callback);
   }
 
-  void off(String event) {
-    _socket?.off(event);
-  }
-
   void disconnect() {
     _socket?.disconnect();
     _socket?.dispose();
     _socket = null;
+  }
+
+  void emit(String event, dynamic data) {
+    _socket?.emit(event, data);
+  }
+
+  // Mevcut off(String event) metodunu bununla DEĞİŞTİR:
+  void off(
+    String event, [
+    void Function(dynamic data)? callback,
+  ]) {
+    if (callback != null) {
+      _socket?.off(event, callback);
+    } else {
+      _socket?.off(event);
+    }
   }
 }

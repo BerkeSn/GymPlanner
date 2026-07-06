@@ -121,6 +121,7 @@ class _FriendsScreenState
         child: _buildBody(state),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'add_friend',
         onPressed: _openSearchSheet,
         child: const Icon(
           Icons.person_add_alt_1,

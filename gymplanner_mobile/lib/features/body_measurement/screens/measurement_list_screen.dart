@@ -84,6 +84,7 @@ class _MeasurementListScreenState
         child: _buildBody(state),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'add_measurement',
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(

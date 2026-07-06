@@ -96,4 +96,15 @@ class ApiConstants {
       '/userfavorite/toggleFavorite';
   static const String getMyFavorites =
       '/userfavorite/getMyFavorites';
+  // --- Mesajlaşma ---
+  static const String startConversation =
+      '/message/startConversation';
+  static const String getConversations =
+      '/message/getConversations';
+  static const String getMessages =
+      '/message/getMessages';
+  static const String sendMessage =
+      '/message/sendMessage';
+  static const String markAsRead =
+      '/message/markAsRead';
 }
