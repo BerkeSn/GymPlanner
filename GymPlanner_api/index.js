@@ -47,8 +47,16 @@ io.on('connection', socket => {
   // Kullanıcı Flutter'dan giriş yapınca kendi odasına (kendi ID'sine) katılsın
   socket.on('join_own_room', userId => {
     socket.join(userId.toString())
+    socket.userId = userId
     console.log(`👤 Kullanıcı ${userId} kendi odasına katıldı.`)
   })
+
+  socket.on('typing', ({ conversationId, receiverId }) => {
+  io.to(receiverId.toString()).emit('typing', {
+    conversationId,
+    userId: socket.userId
+  })
+})
 
   socket.on('disconnect', () => {
     console.log('🔴 Kullanıcı ayrıldı:', socket.id)
