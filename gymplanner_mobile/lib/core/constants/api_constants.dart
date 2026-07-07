@@ -107,4 +107,14 @@ class ApiConstants {
       '/message/sendMessage';
   static const String markAsRead =
       '/message/markAsRead';
+
+  // --- Antrenman Oturumu (Progressive Overload) ---
+  static const String startWorkoutLog =
+      '/workoutlogs/startWorkoutLog';
+  static const String addSetToWorkoutLog =
+      '/workoutlogs/addSetToWorkoutLog';
+  static const String removeSetFromWorkoutLog =
+      '/workoutlogs/removeSetFromWorkoutLog';
+  static const String getExerciseProgress =
+      '/workoutlogs/getExerciseProgress';
 }

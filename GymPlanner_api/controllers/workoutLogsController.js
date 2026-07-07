@@ -142,3 +142,160 @@ exports.updateWorkoutLog = async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 }
+
+// YENİ: Antrenman oturumu başlat (serbest akış — hareket sırası yok)
+exports.startWorkoutLog = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const { workoutRoutineId } = req.params
+
+    const routine = await db.WorkoutRoutine.findOne({
+      where: { id: workoutRoutineId, userId }
+    })
+    if (!routine) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Program bulunamadı.' })
+    }
+
+    const workoutLog = await db.WorkoutLog.create({
+      date: new Date(),
+      workoutRoutineId,
+      userId
+    })
+
+    res.status(201).json({ success: true, workoutLog })
+  } catch (error) {
+    console.error('Start Workout Log Hatası:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+}
+
+// YENİ: Antrenman sırasında tek bir set anlık kaydet
+exports.addSetToWorkoutLog = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const { workoutLogId } = req.params
+    const { exerciseId, setNumber, reps, weight } = req.body
+
+    if (!exerciseId || !setNumber || reps === undefined || weight === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'exerciseId, setNumber, reps ve weight zorunludur.'
+      })
+    }
+
+    const workoutLog = await db.WorkoutLog.findOne({
+      where: { id: workoutLogId, userId }
+    })
+    if (!workoutLog) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Antrenman oturumu bulunamadı.' })
+    }
+
+    const setLog = await db.WorkoutSetLog.create({
+      workoutLogId,
+      exerciseId,
+      setNumber,
+      reps,
+      weight
+    })
+
+    res.status(201).json({ success: true, setLog })
+  } catch (error) {
+    console.error('Add Set Hatası:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+}
+
+// YENİ: Yanlış girilen bir seti geri al
+exports.removeSetFromWorkoutLog = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const { workoutLogId, setId } = req.params
+
+    const workoutLog = await db.WorkoutLog.findOne({
+      where: { id: workoutLogId, userId }
+    })
+    if (!workoutLog) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Antrenman oturumu bulunamadı.' })
+    }
+
+    const setLog = await db.WorkoutSetLog.findOne({
+      where: { id: setId, workoutLogId }
+    })
+    if (!setLog) {
+      return res.status(404).json({ success: false, message: 'Set bulunamadı.' })
+    }
+
+    await setLog.destroy()
+    res.status(200).json({ success: true, message: 'Set silindi.' })
+  } catch (error) {
+    console.error('Remove Set Hatası:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+}
+
+// YENİ: Bir harekete ait tüm geçmiş — grafik + takvim ekranı için
+exports.getExerciseProgress = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const { exerciseId } = req.params
+
+    const setLogs = await db.WorkoutSetLog.findAll({
+      where: { exerciseId },
+      include: [
+        {
+          model: db.WorkoutLog,
+          as: 'workoutLog',
+          where: { userId },
+          attributes: ['id', 'date']
+        }
+      ]
+    })
+
+    const grouped = {}
+    setLogs.forEach(log => {
+      const logId = log.workoutLog.id
+      if (!grouped[logId]) {
+        grouped[logId] = {
+          workoutLogId: logId,
+          date: log.workoutLog.date,
+          sets: []
+        }
+      }
+      grouped[logId].sets.push({
+        id: log.id,
+        setNumber: log.setNumber,
+        reps: log.reps,
+        weight: log.weight
+      })
+    })
+
+    const history = Object.values(grouped).map(entry => {
+      const weights = entry.sets.map(s => s.weight)
+      const maxWeight = Math.max(...weights)
+      const totalVolume = entry.sets.reduce((sum, s) => sum + s.reps * s.weight, 0)
+      // Epley formülü: 1RM = ağırlık * (1 + tekrar/30)
+      const estimated1RM = Math.max(
+        ...entry.sets.map(s => s.weight * (1 + s.reps / 30))
+      )
+      return {
+        ...entry,
+        maxWeight,
+        totalVolume,
+        estimated1RM: Math.round(estimated1RM * 100) / 100
+      }
+    })
+
+    history.sort((a, b) => new Date(a.date) - new Date(b.date))
+
+    res.status(200).json({ success: true, history })
+  } catch (error) {
+    console.error('Get Exercise Progress Hatası:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+}

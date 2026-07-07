@@ -37,4 +37,32 @@ router.put(
   workoutLogsRoute.deleteWorkoutLog
 )
 
+router.post(
+  '/startWorkoutLog/:workoutRoutineId',
+  auth,
+  // authLimiter,
+  workoutLogsRoute.startWorkoutLog
+)
+
+router.post(
+  '/addSetToWorkoutLog/:workoutLogId',
+  auth,
+  // authLimiter,
+  workoutLogsRoute.addSetToWorkoutLog
+)
+
+router.delete(
+  '/removeSetFromWorkoutLog/:workoutLogId/:setId',
+  auth,
+  // authLimiter,
+  workoutLogsRoute.removeSetFromWorkoutLog
+)
+
+router.get(
+  '/getExerciseProgress/:exerciseId',
+  auth,
+  // authLimiter,
+  workoutLogsRoute.getExerciseProgress
+)
+
 module.exports = router

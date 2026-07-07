@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymplanner_mobile/core/models/routine_exercise_model.dart';
 import 'package:gymplanner_mobile/features/exercise/screens/add_exercise_screen.dart';
 import 'package:gymplanner_mobile/features/workout/providers/workout_provider.dart';
+import 'package:gymplanner_mobile/features/workout/screens/create_workout_screen.dart';
+import 'package:gymplanner_mobile/features/workout/screens/exercise_progress_screen.dart';
+
 
 class WorkoutDetailScreen
     extends ConsumerStatefulWidget {
@@ -157,6 +160,24 @@ class _WorkoutDetailScreenState
         actions: [
           IconButton(
             icon: const Icon(
+              Icons.play_circle_outline,
+            ),
+            tooltip: 'Antrenmanı Başlat',
+            onPressed: hasSelectedRoutine
+                ? () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            CreateWorkoutScreen(
+                              routine: routine,
+                            ),
+                      ),
+                    );
+                  }
+                : null,
+          ),
+          IconButton(
+            icon: const Icon(
               Icons.delete_outline,
             ),
             onPressed: hasSelectedRoutine
@@ -293,6 +314,28 @@ class _WorkoutDetailScreenState
                       ),
                       onPressed: () {
                         _deleteExercise(exercise);
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.show_chart,
+                      ),
+                      onPressed: () {
+                        Navigator.of(
+                          context,
+                        ).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                ExerciseProgressScreen(
+                                  exerciseId: exercise
+                                      .exerciseId!,
+                                  exerciseName:
+                                      exercise
+                                          .exerciseName ??
+                                      'Egzersiz',
+                                ),
+                          ),
+                        );
                       },
                     ),
                   ],
