@@ -117,4 +117,16 @@ class ApiConstants {
       '/workoutlogs/removeSetFromWorkoutLog';
   static const String getExerciseProgress =
       '/workoutlogs/getExerciseProgress';
+
+  // --- Kalori Takibi ---
+  static const String getCalorieTarget =
+      '/calorie/getTarget';
+  static const String getCalorieSettings =
+      '/calorie/getSettings';
+  static const String updateCalorieSettings =
+      '/calorie/updateSettings';
+  static const String logCalorieEntry =
+      '/calorie/logEntry';
+  static const String getCalorieEntries =
+      '/calorie/getEntries';
 }

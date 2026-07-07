@@ -5,6 +5,7 @@ import 'package:gymplanner_mobile/core/constants/app_text_styles.dart';
 import 'package:gymplanner_mobile/core/models/user_model.dart';
 import 'package:gymplanner_mobile/features/auth/providers/auth_provider.dart';
 import 'package:gymplanner_mobile/features/auth/screens/login_screen.dart';
+import 'package:gymplanner_mobile/features/calorie/screens/calorie_tracking_screen.dart';
 import 'package:gymplanner_mobile/features/profile/providers/profile_provider.dart';
 import 'package:gymplanner_mobile/features/social/screens/friends_screen.dart';
 
@@ -145,6 +146,21 @@ class _ProfileScreenState
       appBar: AppBar(
         title: const Text('Profil'),
         actions: [
+          IconButton(
+            icon: const Icon(
+              Icons
+                  .local_fire_department_outlined,
+            ),
+            tooltip: 'Kalori Takibi',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const CalorieTrackingScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(
               Icons.group_outlined,

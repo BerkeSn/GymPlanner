@@ -34,6 +34,9 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'senderId',
         as: 'sentMessages'
       });
+
+      User.hasOne(models.CalorieSettings, { foreignKey: 'userId', as: 'calorieSettings' });
+      User.hasMany(models.CalorieEntry, { foreignKey: 'userId', as: 'calorieEntries' });
     }
   }
 
