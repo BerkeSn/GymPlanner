@@ -289,6 +289,14 @@ class _TodayEntryCard extends StatelessWidget {
                       )
                     : ElevatedButton(
                         onPressed: onSubmit,
+                        style:
+                            ElevatedButton.styleFrom(
+                              minimumSize:
+                                  const Size(
+                                    0,
+                                    48,
+                                  ),
+                            ),
                         child: const Text(
                           'Kaydet',
                         ),

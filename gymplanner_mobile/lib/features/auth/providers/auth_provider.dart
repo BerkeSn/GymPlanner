@@ -3,6 +3,11 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:gymplanner_mobile/core/network/socket_service.dart';
 import 'package:gymplanner_mobile/core/network/token_storage.dart';
 import 'package:gymplanner_mobile/features/auth/data/auth_repository.dart';
+import 'package:gymplanner_mobile/features/calorie/providers/calorie_provider.dart';
+import 'package:gymplanner_mobile/features/home/providers/home_provider.dart';
+import 'package:gymplanner_mobile/features/messaging/providers/message_provider.dart';
+import 'package:gymplanner_mobile/features/profile/providers/profile_provider.dart';
+import 'package:gymplanner_mobile/features/workout/providers/workout_provider.dart';
 
 // Repository provider
 final authRepositoryProvider =
@@ -46,9 +51,13 @@ class AuthState {
 class AuthNotifier
     extends StateNotifier<AuthState> {
   final AuthRepository _repository;
+  final Ref _ref; // YENİ
 
-  AuthNotifier(this._repository)
-    : super(const AuthState());
+  AuthNotifier(
+    this._repository,
+    this._ref,
+  ) // YENİ: _ref parametresi
+  : super(const AuthState());
 
   void _connectSocket(
     Map<String, dynamic>? user,
@@ -59,6 +68,15 @@ class AuthNotifier
         id.toString(),
       );
     }
+  }
+
+  // YENİ
+  void _invalidateUserScopedProviders() {
+    _ref.invalidate(profileProvider);
+    _ref.invalidate(workoutProvider);
+    _ref.invalidate(homeProvider);
+    _ref.invalidate(conversationListProvider);
+    _ref.invalidate(calorieProvider);
   }
 
   Future<bool> login({
@@ -73,6 +91,7 @@ class AuthNotifier
         loginInput: loginInput,
         password: password,
       );
+      _invalidateUserScopedProviders(); // YENİ: state'i user set edilmeden ÖNCE temizle
       state = state.copyWith(
         status: AuthStatus.success,
         user: data['user'],
@@ -115,6 +134,7 @@ class AuthNotifier
         phone: phone,
         birthdate: birthdate,
       );
+      _invalidateUserScopedProviders(); // YENİ
       state = state.copyWith(
         status: AuthStatus.success,
         user: data['user'],
@@ -134,12 +154,15 @@ class AuthNotifier
   }
 
   Future<bool> tryAutoLogin() async {
-    final hasToken = await TokenStorage.isLoggedIn();
+    final hasToken =
+        await TokenStorage.isLoggedIn();
     if (!hasToken) {
       return false;
     }
 
-    state = state.copyWith(status: AuthStatus.loading);
+    state = state.copyWith(
+      status: AuthStatus.loading,
+    );
     try {
       final user = await _repository.getProfile();
       state = state.copyWith(
@@ -159,12 +182,17 @@ class AuthNotifier
     await _repository.logout();
     SocketService.instance.disconnect();
     state = const AuthState();
+    _invalidateUserScopedProviders(); // YENİ
   }
 }
 
 final authProvider =
-    StateNotifierProvider<AuthNotifier, AuthState>(
+    StateNotifierProvider<
+      AuthNotifier,
+      AuthState
+    >(
       (ref) => AuthNotifier(
         ref.watch(authRepositoryProvider),
-      ),
+        ref,
+      ), // YENİ: ref eklendi
     );
