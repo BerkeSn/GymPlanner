@@ -4,7 +4,7 @@ exports.createWorkoutRoutine = async (req, res) => {
   try {
     const userId = req.user.id
 
-    const { name, description } = req.body
+    const { name, description, daysPerWeek, trainingGoal } = req.body   // ⬅️ DEĞİŞTİ
 
     if (!name) {
       return res
@@ -16,7 +16,9 @@ exports.createWorkoutRoutine = async (req, res) => {
       name,
       description,
       userId,
-      isActive: true
+      isActive: true,
+      daysPerWeek: daysPerWeek || 3,               // ⬅️ YENİ
+      trainingGoal: trainingGoal || 'Hypertrophy'   // ⬅️ YENİ
     })
 
     res.status(201).json({
@@ -121,7 +123,7 @@ exports.updateWorkoutRoutine = async (req, res) => {
   try {
     const userId = req.user.id
     const { id } = req.params
-    const { name, description } = req.body
+    const { name, description, daysPerWeek, trainingGoal } = req.body   // ⬅️ DEĞİŞTİ
 
     const workoutRoutine = await db.WorkoutRoutine.findOne({
       where: { id, userId }
@@ -144,10 +146,18 @@ exports.updateWorkoutRoutine = async (req, res) => {
     const updatedDescription =
       description !== undefined ? description : workoutRoutine.description
 
+    const updatedDaysPerWeek =                                          // ⬅️ YENİ
+      daysPerWeek !== undefined ? daysPerWeek : workoutRoutine.daysPerWeek
+
+    const updatedTrainingGoal =                                         // ⬅️ YENİ
+      trainingGoal !== undefined ? trainingGoal : workoutRoutine.trainingGoal
+
     await workoutRoutine.update({
       name: updatedName,
       description: updatedDescription,
-      isActive
+      isActive,
+      daysPerWeek: updatedDaysPerWeek,       // ⬅️ YENİ
+      trainingGoal: updatedTrainingGoal      // ⬅️ YENİ
     })
 
     res

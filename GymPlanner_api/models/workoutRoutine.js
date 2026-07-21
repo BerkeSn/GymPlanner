@@ -28,6 +28,17 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: false
+      },
+      // ⬇️ YENİ ALANLAR
+      daysPerWeek: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 3
+      },
+      trainingGoal: {
+        type: DataTypes.ENUM('Hypertrophy', 'Strength', 'Endurance', 'Fat Loss'),
+        allowNull: false,
+        defaultValue: 'Hypertrophy'
       }
     },
     {
