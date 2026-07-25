@@ -37,6 +37,8 @@ module.exports = (sequelize, DataTypes) => {
 
       User.hasOne(models.CalorieSettings, { foreignKey: 'userId', as: 'calorieSettings' });
       User.hasMany(models.CalorieEntry, { foreignKey: 'userId', as: 'calorieEntries' });
+
+      User.hasMany(models.MealEntry, { foreignKey: 'userId', as: 'mealEntries' });
     }
   }
 
