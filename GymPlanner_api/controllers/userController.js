@@ -424,3 +424,56 @@ exports.searchUsers = async (req, res) => {
     res.status(500).json({ success: false, message: 'Kullanıcı aranırken bir hata oluştu.' })
   }
 }
+
+exports.getPublicProfile = async (req, res) => {
+  try {
+    const currentUserId = req.user.id
+    const { id } = req.params
+
+    const user = await db.User.findByPk(id, {
+      attributes: ['id', 'username', 'name', 'surname']
+    })
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Kullanıcı bulunamadı.' })
+    }
+
+    if (Number(id) === currentUserId) {
+      return res.status(200).json({
+        success: true,
+        user,
+        friendshipStatus: 'self',
+        friendshipId: null
+      })
+    }
+
+    const friendship = await db.Friendship.findOne({
+      where: {
+        [Op.or]: [
+          { requesterId: currentUserId, receiverId: id },
+          { requesterId: id, receiverId: currentUserId }
+        ]
+      }
+    })
+
+    let friendshipStatus = 'none'
+    let friendshipId = null
+
+    if (friendship) {
+      friendshipId = friendship.id
+      if (friendship.status === 'accepted') {
+        friendshipStatus = 'friends'
+      } else if (friendship.status === 'pending') {
+        friendshipStatus =
+          friendship.requesterId === currentUserId ? 'requestSent' : 'requestReceived'
+      } else {
+        friendshipStatus = 'rejected'
+      }
+    }
+
+    res.status(200).json({ success: true, user, friendshipStatus, friendshipId })
+  } catch (error) {
+    console.error('Get Public Profile Hatası:', error)
+    res.status(500).json({ success: false, error: 'Profil bilgisi alınırken bir hata oluştu.' })
+  }
+}
