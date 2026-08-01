@@ -143,14 +143,11 @@ exports.updateWorkoutRoutine = async (req, res) => {
     const updatedName =
       name !== undefined && name !== null ? name : workoutRoutine.name
 
-    const updatedDescription =
-      description !== undefined ? description : workoutRoutine.description
+    const updatedDescription = description !== undefined ? description : workoutRoutine.description
 
-    const updatedDaysPerWeek =                                          // ⬅️ YENİ
-      daysPerWeek !== undefined ? daysPerWeek : workoutRoutine.daysPerWeek
+    const updatedDaysPerWeek = daysPerWeek !== undefined ? daysPerWeek : workoutRoutine.daysPerWeek
 
-    const updatedTrainingGoal =                                         // ⬅️ YENİ
-      trainingGoal !== undefined ? trainingGoal : workoutRoutine.trainingGoal
+    const updatedTrainingGoal = trainingGoal !== undefined ? trainingGoal : workoutRoutine.trainingGoal
 
     await workoutRoutine.update({
       name: updatedName,

@@ -299,3 +299,58 @@ exports.getExerciseProgress = async (req, res) => {
     res.status(500).json({ success: false, error: error.message })
   }
 }
+
+exports.getStreakAnalytics = async (req, res) => {
+  try {
+    const userId = req.user.id
+
+    const logs = await db.WorkoutLog.findAll({
+      where: { userId },
+      attributes: ['date'],
+      order: [['date', 'ASC']]
+    })
+
+    // Aynı güne ait birden fazla WorkoutLog olabilir (aynı gün 2 antrenman),
+    // tekilleştiriyoruz — streak günlük bazda hesaplanır.
+    const uniqueDates = [
+      ...new Set(logs.map(l => l.date.toISOString().split('T')[0]))
+    ].sort()
+
+    // En uzun streak: ardışık günleri tara
+    let longestStreak = 0
+    let tempStreak = 0
+    let previousDate = null
+
+    for (const dateStr of uniqueDates) {
+      if (previousDate) {
+        const diffDays =
+          (new Date(dateStr) - new Date(previousDate)) / (1000 * 60 * 60 * 24)
+        tempStreak = diffDays === 1 ? tempStreak + 1 : 1
+      } else {
+        tempStreak = 1
+      }
+      longestStreak = Math.max(longestStreak, tempStreak)
+      previousDate = dateStr
+    }
+
+    // Güncel streak: bugünden geriye doğru kesintisiz günleri say
+    const dateSet = new Set(uniqueDates)
+    let currentStreak = 0
+    const cursor = new Date()
+    while (dateSet.has(cursor.toISOString().split('T')[0])) {
+      currentStreak++
+      cursor.setDate(cursor.getDate() - 1)
+    }
+
+    res.status(200).json({
+      success: true,
+      currentStreak,
+      longestStreak,
+      totalActiveDays: uniqueDates.length,
+      activeDates: uniqueDates
+    })
+  } catch (error) {
+    console.error('Get Streak Analytics Hatası:', error)
+    res.status(500).json({ success: false, error: error.message })
+  }
+}

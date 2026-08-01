@@ -65,4 +65,11 @@ router.get(
   workoutLogsRoute.getExerciseProgress
 )
 
+router.get(
+  '/getStreakAnalytics',
+  auth,
+  // authLimiter,
+  workoutLogsRoute.getStreakAnalytics
+)
+
 module.exports = router

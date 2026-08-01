@@ -19,7 +19,6 @@ routeFiles.forEach(file => {
 
     router.use(`/${routePath}`, route)
 
-    // console.log(`✅ Route yüklendi: /api/${routePath} -> ${file}`);
   } catch (error) {
     console.error(`❌ Route yüklenirken hata oluştu: ${file}`, error)
   }
