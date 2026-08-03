@@ -89,6 +89,16 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: 'Gym'
     },
+    goal: {
+    type: DataTypes.ENUM('Lose Weight', 'Gain Muscle', 'Maintain', 'Improve Endurance'),
+    allowNull: false,
+    defaultValue: 'Maintain'
+  },
+  activityLevel: {
+    type: DataTypes.ENUM('sedentary', 'light', 'moderate', 'active'),
+    allowNull: false,
+    defaultValue: 'moderate'
+  },
   }, {
     sequelize,
     modelName: 'User',

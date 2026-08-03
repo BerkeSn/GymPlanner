@@ -31,9 +31,9 @@ exports.createMeasurement = async (req, res) => {
       height,
       neck,
       waist,
+      hip,
       bodyFatPercentage,
       muscleMass,
-      goal
     } = req.body
 
     if (!weight || !height) {
@@ -52,9 +52,9 @@ exports.createMeasurement = async (req, res) => {
       height,
       neck,
       waist,
+      hip,
       bodyFatPercentage,
       muscleMass,
-      goal: goal || 'Maintain'
     })
 
     res.status(201).json({

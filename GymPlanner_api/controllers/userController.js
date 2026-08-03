@@ -145,7 +145,9 @@ exports.updateProfile = async (req, res) => {
       birthdate,
       gender,
       locationPreference,
-      email
+      email,
+      goal,
+      activityLevel 
     } = req.body
 
     if (username) {
@@ -186,6 +188,8 @@ exports.updateProfile = async (req, res) => {
     if (email) updateFields.email = email
     if (locationPreference !== undefined)
       updateFields.locationPreference = locationPreference
+    if(goal !== undefined) updateFields.goal = goal
+    if(activityLevel !== undefined) updateFields.activityLevel = activityLevel
 
     const [updatedRows] = await db.User.update(updateFields, {
       where: { id: userId }

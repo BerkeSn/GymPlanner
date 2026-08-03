@@ -32,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.FLOAT,
         allowNull: true
       },
+      hip: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+      },
       bodyFatPercentage: {
         type: DataTypes.FLOAT,
         allowNull: true

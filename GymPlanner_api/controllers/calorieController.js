@@ -11,7 +11,8 @@ const ACTIVITY_MULTIPLIERS = {
 const GOAL_ADJUSTMENTS = {
   'Lose Weight': -500,
   'Gain Muscle': 300,
-  'Maintain': 0
+  'Maintain': 0,
+  'Improve Endurance': 0
 }
 
 function calculateAge (birthdate) {
@@ -49,6 +50,7 @@ exports.getTarget = async (req, res) => {
       where: { userId },
       order: [['date', 'DESC']]
     })
+
     if (!latestMeasurement) {
       return res.status(400).json({
         success: false,
@@ -66,8 +68,9 @@ exports.getTarget = async (req, res) => {
       height: latestMeasurement.height,
       age
     })
-    const tdee = bmr * ACTIVITY_MULTIPLIERS[activityLevel]
-    const adjustment = GOAL_ADJUSTMENTS[latestMeasurement.goal] || 0
+
+    const tdee = bmr * ACTIVITY_MULTIPLIERS[user.activityLevel]
+    const adjustment = GOAL_ADJUSTMENTS[user.goal] || 0 
     const targetCalories = Math.round(tdee + adjustment)
 
     res.status(200).json({
