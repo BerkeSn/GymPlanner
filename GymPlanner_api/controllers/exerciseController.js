@@ -3,7 +3,7 @@ const db = require('../models');
 
 exports.createExercise = async (req, res) => {
     try {
-        const { name, description, imageUrl, difficulty, muscleGroupId, equipmentId } = req.body;
+        const { name, description, imageUrl, difficulty, muscleGroupId, equipmentId, availableAt } = req.body;
 
         if (!name || !muscleGroupId || !equipmentId) {
             return res.status(400).json({ 
@@ -33,7 +33,8 @@ exports.createExercise = async (req, res) => {
             imageUrl,
             difficulty,
             muscleGroupId,
-            equipmentId
+            equipmentId,
+            availableAt
         });
 
         res.status(201).json({

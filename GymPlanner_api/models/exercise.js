@@ -31,6 +31,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             defaultValue: 'Beginner'
         },
+        availableAt: {
+            type: DataTypes.ENUM('Home', 'Gym', 'Both'),
+            allowNull: false,
+            defaultValue: 'Gym'
+        },
     }, {
         sequelize,
         modelName: 'Exercise',

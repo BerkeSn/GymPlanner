@@ -10,28 +10,34 @@ async function runSeed() {
     let skipped = 0
 
     for (const item of data) {
-      const [muscleGroup] = await db.MuscleGroup.findOrCreate({
+    const [muscleGroup] = await db.MuscleGroup.findOrCreate({
         where: { name: item.muscleGroup },
         defaults: { name: item.muscleGroup }
-      })
+    })
 
-      const [equipment] = await db.Equipment.findOrCreate({
+    const [equipment] = await db.Equipment.findOrCreate({
         where: { name: item.equipment },
         defaults: { name: item.equipment }
-      })
+    })
 
-      const [exercise, wasCreated] = await db.Exercise.findOrCreate({
+    const [exercise, wasCreated] = await db.Exercise.findOrCreate({
         where: { name: item.name },
         defaults: {
-          description: item.description,
-          difficulty: item.difficulty || 'Beginner',
-          muscleGroupId: muscleGroup.id,
-          equipmentId: equipment.id
+            description: item.description,
+            difficulty: item.difficulty || 'Beginner',
+            availableAt: item.availableAt || 'Gym',   // ⬅️ YENİ
+            muscleGroupId: muscleGroup.id,
+            equipmentId: equipment.id
         }
-      })
+    })
 
-      wasCreated ? created++ : skipped++
+    if (!wasCreated && exercise.availableAt !== (item.availableAt || 'Gym')) {
+        exercise.availableAt = item.availableAt || 'Gym'
+        await exercise.save()
     }
+
+    wasCreated ? created++ : skipped++
+}
 
     console.log(`Seed tamamlandı. Eklenen: ${created}, zaten var olan: ${skipped}`)
   } catch (error) {
